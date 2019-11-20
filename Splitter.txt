@@ -1,0 +1,17 @@
+This is the python snippet for the split
+
+
+import subprocess
+
+k = subprocess.check_output(
+    '.\youtube-dl -g "https://www.youtube.com/watch?v=LMYWkNGCGl8"', 
+    stderr=subprocess.STDOUT,
+    shell=True)
+s = k.decode("utf-8") 
+p = s.split('\n')
+os.system('ffmpeg -ss 12:15 -i "'+p[0]+'" -ss 12:15 -i "'+p[1]+'" -t 0:5 -map 0:v -map 1:a -c:v libx264 -c:a aac output1.mkv')
+
+
+
+Where 12:15 is the starting time from where you want to split, 0:5 is the duration of the video you want after split,
+output1.mkv is the output file
