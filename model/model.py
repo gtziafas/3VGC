@@ -65,4 +65,4 @@ def test():
 
 	out = model((v,a,t))
 
-	print(out.shape, out[:,:,-1])
+	print(out.shape, out)

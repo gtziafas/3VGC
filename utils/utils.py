@@ -54,6 +54,7 @@ class MultiHeadAttention(Module):
         return multihead_attn_fn(queries, keys, values, self.q_transformations, self.k_transformations,
                                  self.v_transformations, self.Wo, mask)
 
+# x -> x + pe(x)
 class PositionalEncoding(Module):
 	def __init__(self, freq: int = 10000, dropout_rate: float = 0.1) -> None:
 		super(PositionalEncoding, self).__init__()

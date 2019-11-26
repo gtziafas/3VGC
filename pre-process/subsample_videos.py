@@ -1,3 +1,6 @@
+## USAGE: python3 subsample_videos.py ~/.../videos/ 15 mkv mkv
+## script DEMANDS a dir named videos_subsampled to exist in the same lvl as ~/.../videos/
+## to save all subsampled videos
 import cv2
 import os
 import sys
