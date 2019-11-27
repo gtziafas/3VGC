@@ -16,9 +16,6 @@ class TrimodalFusionNetwork(Module):
 
 	def forward(self, x: Tuple[FloatTensor, FloatTensor, FloatTensor])  -> FloatTensor:
 		video, audio, text = x[0:3]
-		
-		# load hyperparams
-		batch_size = video.shape[0]
 
 		# get feature vectors from each modality (pre-trained / end-to-end) -> [3 x B x S x {d_v , d_a , d_t}]
 		encodings = [self.video_encoder(video), self.audio_encoder(audio), self.text_encoder(text)]
