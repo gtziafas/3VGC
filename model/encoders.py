@@ -22,10 +22,8 @@ class CNN1D(Module):
 									conv_kernel=kernel_sizes[2], conv_stride=kernel_sizes[2])
 
 	def conv_block(self, in_channels: int, out_channels: int, conv_kernel: int, conv_stride : int, pool_kernel: int=2) -> Module:
-		block = Sequential(
-						Conv1d(in_channels=in_channels,   out_channels=out_channels,  kernel_size=conv_kernel, stride=conv_stride),
-						MaxPool1d(kernel_size=pool_kernel, stride=pool_kernel))
-		return block 
+		return Sequential(Conv1d(in_channels=in_channels,   out_channels=out_channels,  kernel_size=conv_kernel, stride=conv_stride),
+						MaxPool1d(kernel_size=pool_kernel, stride=pool_kernel)) 
 
 	def forward(self, x: FloatTensor) -> FloatTensor:
 		batch_size = x.shape[0]
