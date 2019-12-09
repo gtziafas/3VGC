@@ -1,4 +1,4 @@
-from src.utils.imports import *
+from utils.imports import *
 
 # d_model -> d_ff -> d_model
 class PositionWiseFeedForward(Module):
@@ -56,19 +56,19 @@ class MultiHeadAttention(Module):
 
 # x -> x + pe(x)
 class PositionalEncoding(Module):
-	def __init__(self, freq: int = 10000, dropout_rate: float = 0.1) -> None:
-		super(PositionalEncoding, self).__init__()
-		self.freq = freq 
-		self.dropout_rate = dropout_rate
+    def __init__(self, freq: int = 10000, dropout_rate: float = 0.1) -> None:
+        super(PositionalEncoding, self).__init__()
+        self.freq = freq
+        self.dropout_rate = dropout_rate
 
-	def forward(self, x: FloatTensor) -> FloatTensor:
-		b, n, d_model = x.shape[0:3]
-		pe = torch.zeros(n, d_model, device=x.device)
-		position = torch.arange(0, n, device=x.device, dtype=torch.float).unsqueeze(1)
-		div_term = torch.exp(torch.arange(0, d_model, 2, device=x.device, dtype=torch.float) *
-		                     - (torch.log(torch.tensor(self.freq, dtype=torch.float, device=x.device)) / d_model))
-		pe[:, 0::2] = torch.sin(position * div_term)
-		pe[:, 1::2] = torch.cos(position * div_term)
-		pe = pe.repeat(b, 1, 1)
+    def forward(self, x: FloatTensor) -> FloatTensor:
+        b, n , d_model = x.shape[0:3]
+        pe = torch.zeros(n, d_model, device=x.device)
+        position = torch.arange(0, n, device=x.device, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2, device=x.device, dtype=torch.float) *
+                             - (torch.log(torch.tensor(self.freq, dtype=torch.float, device=x.device)) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.repeat(b, 1, 1)
 
-    	return F.dropout(pe, self.dropout_rate) + x
+        return F.dropout(pe, self.dropout_rate)

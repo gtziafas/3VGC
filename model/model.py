@@ -2,7 +2,7 @@ from utils.imports import *
 from model.contextualization import ContextualizationLayer
 from model.fusion import EarlyFusion
 
-class TrimodalFusionNetwork(Module):
+class TrimodalFusionClassifier(Module):
 	def __init__(self, encoders: ModuleList, model_sizes: Tuple[int,int,int], fusion_fn: tensor_map, 
 				 feature_sizes: Tuple[int,int,int], num_classes: int = 8, dropout_rate: float = 0.1) -> None:
 		super(TrimodalFusionNetwork, self).__init__()
@@ -53,7 +53,7 @@ def test():
 	enc_listed = ModuleList([video_encoder, audio_encoder, text_encoder])
 	fusion_fn = EarlyFusion()
 
-	model = TrimodalFusionNetwork(encoders=enc_listed, model_sizes=(d_equ,d_hidden,d_fused),
+	model = TrimodalFusionClassifier(encoders=enc_listed, model_sizes=(d_equ,d_hidden,d_fused),
 								  feature_sizes=(d_v,d_a,d_t), fusion_fn=fusion_fn).to('cuda')
 
 	v = torch.rand(2,5,3,15,10,10, device='cuda').view(2,5,-1)

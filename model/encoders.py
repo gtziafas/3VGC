@@ -11,14 +11,33 @@ class CNN3D(Module):
 
 # extract features from text with 1D convolutions ??
 class CNN1D(Module):
-	def __init__(self, activation_fn: tensor_map, *args, **kwargs) -> None:
+	def __init__(self, activation_fn: tensor_map=F.gelu, num_channels: int=100, kernel_sizes: Tuple[int,int,int]=(3,4,3)) -> None:
 		super(CNN1D, self).__init__()
 		self.activation_fn = activation_fn
-		self.conv1 = Conv1d(in_channels=1,   out_channels=50,  kernel_size=3, stride=1)
-		self.conv2 = Conv1d(in_channels=1,   out_channels=50,  kernel_size=4, stride=1)
-		self.conv3 = Conv1d(in_channels=100, out_channels=100, kernel_size=2, stride=1)
+		self.conv1 = ModuleList([self.conv_block(in_channels=1, out_channels=num_channels//2, 
+								conv_kernel=kernel_sizes[0], conv_stride=2),
+								self.conv_block(in_channels=1, out_channels=num_channels//2, 
+								conv_kernel=kernel_sizes[1], conv_stride=2)])
+		self.conv2 = self.conv_block(in_channels=num_channels, out_channels=num_channels, 
+									conv_kernel=kernel_sizes[2], conv_stride=kernel_sizes[2])
+
+	def conv_block(self, in_channels: int, out_channels: int, conv_kernel: int, conv_stride : int, pool_kernel: int=2) -> Module:
+		block = Sequential(
+						Conv1d(in_channels=in_channels,   out_channels=out_channels,  kernel_size=conv_kernel, stride=conv_stride),
+						MaxPool1d(kernel_size=pool_kernel, stride=pool_kernel))
+		return block 
+
 	def forward(self, x: FloatTensor) -> FloatTensor:
-		NotImplemented
+		batch_size = x.shape[0]
+
+		x = x.view(batch_size, -1).unsqueeze(1)				# -> [B x 1 x S*d_embedd]
+		x = [self.activation_fn(c(x)) for c in self.conv1]	# -> 2 x [B x 50 x (S*d_embedd)/4]
+		x = torch.cat(x, dim=1)								# -> [B x 100 x (S*d_embedd)/4]
+		x = self.activation_fn(self.conv2(x)) 				# -> [B x 100 x (S*d_embedd)/24]
+
+		x = x.view(batch_size, -1)	# flatten for linear projection
+		return x
+
 
 
 # audio ?
@@ -29,40 +48,40 @@ class TransformerEncoderLayer(Module):
 	def __init__(self, vector_size: int, num_heads: int=6, d_ff: float=2048, dropout_rate: float=0.1) -> None:
 		super(TransformerEncoderLayer, self).__init__()
 		self.position_wise = PositionWiseFeedForward(d_model=vector_size, d_ff=d_ff, activation_fn=F.gelu)
-		self.mha = MultiHeadAttention(num_heads=num_heads, d_k=d_model, d_model=d_model, d_v=d_model)
-		self.layer_norm_1 = LayerNorm(d_model)
-        self.layer_norm_2 = LayerNorm(d_model)
-        self.dropout_rate = dropout_rate
+		self.mha = MultiHeadAttention(num_heads=num_heads, d_k=vector_size, d_model=vector_size, d_v=vector_size)
+		self.layer_norm_1 = LayerNorm(vector_size)
+		self.layer_norm_2 = LayerNorm(vector_size)
+		self.dropout_rate = dropout_rate
 
-    def forward(self, x: Tuple[FloatTensor, LongTensor]) -> Tuple[Tensor, LongTensor]:
-        inputs, mask = x[0], x[1]
-        attended = self.mha(inputs, inputs, inputs, mask)
-        attended = attended + inputs
-        attended_norm = self.layer_norm_1(attended)
-        attended_norm = F.dropout(attended_norm, self.dropout_rate)
+	def forward(self, x: Tuple[FloatTensor, LongTensor]) -> Tuple[Tensor, LongTensor]:
+		inputs, mask = x[0], x[1]
+		attended = self.mha(inputs, inputs, inputs, mask)
+		attended = attended + inputs
+		attended_norm = self.layer_norm_1(attended)
+		attended_norm = F.dropout(attended_norm, self.dropout_rate)
 
-        transformed = self.position_wise(attended_norm)
-        transformed = attended_norm + transformed
-        transformed_norm = self.layer_norm_2(transformed)
-        transformed_norm = F.dropout(transformed_norm, self.dropout_rate)
+		transformed = self.position_wise(attended_norm)
+		transformed = attended_norm + transformed
+		transformed_norm = self.layer_norm_2(transformed)
+		transformed_norm = F.dropout(transformed_norm, self.dropout_rate)
 
-        return transformed_norm, mask
+		return transformed_norm, mask
 
 class TransformerEncoder(Module):
-    def __init__(self, module_maker: Module, num_layers: int=1, *args, **kwargs) -> None:
-        super(Encoder, self).__init__()
-        self.positional_encoding = PositionalEncoding()
-        self.network = Sequential(*[module_maker(*args, **kwargs) for _ in range(num_layers)])
+	def __init__(self, module_maker: Module, num_layers: int=1, *args, **kwargs) -> None:
+		super(Encoder, self).__init__()
+		self.positional_encoding = PositionalEncoding()
+		self.network = Sequential(*[module_maker(*args, **kwargs) for _ in range(num_layers)])
 
-    def forward(self, x: FloatTensor, mask: LongTensor) -> Tensor:
-    	x = self.positional_encoding(x)
-        return self.network((x, mask))[0]
+	def forward(self, x: FloatTensor, mask: LongTensor) -> FloatTensor:
+		x = self.positional_encoding(x)
+		return self.network((x, mask))[0]
 
 # wrapper for all three encoders
 class ModalityEncoder(Module):
-	def __init__(self, features: Module, d_in: int, d_out: int) -> None:
+	def __init__(self, feature_extractor: Module, d_in: int, d_out: int, *args, **kwargs) -> None:
 		super(ModalityEncoder, self).__init__()
-		self.features = features 
+		self.features = feature_extractor(*args, **kwargs)
 		self.linear = Linear(d_in, d_out)
 
 	def forward(self, x:FloatTensor) -> FloatTensor:
@@ -73,23 +92,27 @@ class ModalityEncoder(Module):
 		return out 
 
 
-def example():
-	d_v, d_a, d_t = 10, 10, 10 
-	
+def txt_example():
+	d_v, d_a, d_t = 10, 10, 1024 
+	device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 	# text encoding
-	seq_len = 5
-	vector_size = 512
-	attn_enc = TransformerEncoder(module_maker=TransformerEncoderLayer(),
-								 num_layers=1, vector_size=vector_size, num_heads=1)
-	text_encoder = ModalityEncoder(features=attn_enc, d_in=seq_len*vector_size, d_out=d_a)
+	max_seq_len, d_embedd = 20, 300
+	d_feats = 24900		# because of CNN1D modules ~= max_seq_len * d_embedd / 24
+	text_encoder = ModalityEncoder(feature_extractor=CNN1D,
+									d_in=24900, d_out=d_t,
+									activation_fn=F.gelu,
+									num_channels=100,
+									kernel_sizes=(3,4,3)).to(device)
 
-	# video encoding
-	h, w = 100, 100 
-	fv = 15 #15 frames per video sample
-	cnn3d = CNN3D()
-	video_encoder = ModalityEncoder(features=cnn3d, d_in=1024, d_out=d_v)
+	# placeholding
+	classifier = Sequential(text_encoder,
+							Linear(d_t, 8)).to(device)
 
-	# audio encoding
-	fa = 150 #150 audio samples per video sample
-	# openSMILE 6392 feature vectors somehow
-	audio_encoder = ModalityEncoder(features=None, d_in=6392, d_out=d_a)
+
+	# 10 random captions from consecutive 5-sec video samples
+	batch_size = 10
+	captions = torch.rand(batch_size, max_seq_len, d_embedd, device='cuda')
+	prediction = classifier(captions)
+
+	print(prediction)
