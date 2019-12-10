@@ -1,13 +1,5 @@
 from utils.imports import *
-from utils.utils import PositionWiseFeedForward, MultiHeadAttention, PositionalEncoding
-
-# extracting features from videos with 3D convolutions
-class CNN3D(Module):
-	def __init__(self, *args, **kwargs) -> None:
-		super(CNN3D, self).__init__()
-		NotImplemented
-	def forward(self, x: FloatTensor) -> FloatTensor:
-		NotImplemented
+from utils.utils import PositionWiseFeedForward, MultiHeadAttention, PositionalEncoding, ModalityEncoder
 
 # extract features from text with 1D convolutions ??
 class CNN1D(Module):
@@ -35,11 +27,6 @@ class CNN1D(Module):
 
 		x = x.view(batch_size, -1)	# flatten for linear projection
 		return x
-
-
-
-# audio ?
-
 
 # extract features from text with self-attention ??
 class TransformerEncoderLayer(Module):
@@ -75,23 +62,8 @@ class TransformerEncoder(Module):
 		x = self.positional_encoding(x)
 		return self.network((x, mask))[0]
 
-# wrapper for all three encoders
-class ModalityEncoder(Module):
-	def __init__(self, feature_extractor: Module, d_in: int, d_out: int, *args, **kwargs) -> None:
-		super(ModalityEncoder, self).__init__()
-		self.features = feature_extractor(*args, **kwargs)
-		self.linear = Linear(d_in, d_out)
-
-	def forward(self, x:FloatTensor) -> FloatTensor:
-		features = self.features(x)
-		out = self.linear(features)
-		out = F.softmax(out, dim=-1)
-
-		return out 
-
-
 def txt_example():
-	d_v, d_a, d_t = 10, 10, 1024 
+	d_t = 1024 
 	device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 	# text encoding

@@ -1,5 +1,19 @@
 from utils.imports import *
 
+# wrapper for all three encoders
+class ModalityEncoder(Module):
+    def __init__(self, feature_extractor: Module, d_in: int, d_out: int, *args, **kwargs) -> None:
+        super(ModalityEncoder, self).__init__()
+        self.features = feature_extractor(*args, **kwargs)
+        self.linear = Linear(d_in, d_out)
+
+    def forward(self, x:FloatTensor) -> FloatTensor:
+        features = self.features(x)
+        out = self.linear(features)
+        out = F.softmax(out, dim=-1)
+
+        return out 
+        
 # d_model -> d_ff -> d_model
 class PositionWiseFeedForward(Module):
     def __init__(self, d_model: int, activation_fn: tensor_map, d_ff: int, dropout_rate: float = 0.1) -> None:
