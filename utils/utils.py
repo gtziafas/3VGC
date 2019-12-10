@@ -85,4 +85,4 @@ class PositionalEncoding(Module):
         pe[:, 1::2] = torch.cos(position * div_term)
         pe = pe.repeat(b, 1, 1)
 
-        return F.dropout(pe, self.dropout_rate)
+        return F.dropout(pe, self.dropout_rate) + x
