@@ -23,4 +23,4 @@ class AverageFusion(Module):
 		return torch.mean(torch.stack(tensor_list), dim=0)
 
 
-# todo: TensorFusion, HierarchicalFusion
+# TODO: TensorFusion, HierarchicalFusion
