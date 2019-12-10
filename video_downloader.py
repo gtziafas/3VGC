@@ -3,6 +3,7 @@ import youtube_dl
 import subprocess
 
 """Download a video in n second fragments"""
+"""Requires that ffmpeg and ffprobe are installed!"""
 
 
 def get_length(input_video):
@@ -26,13 +27,17 @@ def download_video(url: str, class_string: str, n_seconds: int = 30):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
     # Sample
-
+    # For each downloaded file
     for index, filename in enumerate(os.listdir(output_directory)):
         print(index)
 
+        # Only look at video files
         if filename.endswith(".mp4") or filename.endswith(".mkv"):
+
             length = int(float(get_length(output_directory + '/' + filename)))
+
             print(length, int(length / n_seconds) - 1)
+
             # TODO: divide duration by n to get range size
             for fragment in range(0, int(length / n_seconds) - 1):
                 start_seconds = fragment * n_seconds
