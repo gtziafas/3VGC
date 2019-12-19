@@ -38,7 +38,7 @@ def download_video(url: str, class_string: str, n_seconds: int = 30):
 
             print(length, int(length / n_seconds) - 1)
 
-            # TODO: divide duration by n to get range size
+            # Divide duration by n to get range size
             for fragment in range(0, int(length / n_seconds) - 1):
                 start_seconds = fragment * n_seconds
                 start_time = str(int(start_seconds/60)) + ":" + str(start_seconds % 60)
@@ -54,4 +54,5 @@ def download_video(url: str, class_string: str, n_seconds: int = 30):
             os.remove(output_directory + '/' + filename)
 
 
-download_video('https://www.youtube.com/watch?v=h2uDE8TuULs', "drama", 30)
+if __name__ == "__main__":
+    download_video('https://www.youtube.com/watch?v=h2uDE8TuULs', "drama", 30)
