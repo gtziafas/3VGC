@@ -21,8 +21,7 @@ def download_video(url: str, class_string: str, n_seconds: int = 30):
     # Download the video in n second fragments
     ydl_opts = {
         'outtmpl': output_directory + '/%(id)s%(ext)s',
-        'writesubtitles': True,
-        'subtitlesformat': 'srt'
+        'writesubtitles': True
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -31,7 +30,7 @@ def download_video(url: str, class_string: str, n_seconds: int = 30):
     for index, filename in enumerate(os.listdir(output_directory)):
         print(index)
 
-        # Only look at video files
+        # Split files
         if filename.endswith(".mp4") or filename.endswith(".mkv"):
 
             length = int(float(get_length(output_directory + '/' + filename)))
@@ -50,8 +49,14 @@ def download_video(url: str, class_string: str, n_seconds: int = 30):
                           '" -t 0:' + str(n_seconds) + ' -map 0:v -map 1:a -c:v libx264 -c:a aac ' + \
                           output_directory + '/' + os.path.splitext(filename)[0] + str(fragment) + '.mkv')
 
-        if os.path.exists(output_directory + '/' + filename):
-            os.remove(output_directory + '/' + filename)
+            # Remove the file after it was split
+            if os.path.exists(output_directory + '/' + filename):
+                os.remove(output_directory + '/' + filename)
+
+        # Split subtitle files
+        elif filename.endswith(".vtt"):
+            #TODO
+            pass
 
 
 if __name__ == "__main__":
