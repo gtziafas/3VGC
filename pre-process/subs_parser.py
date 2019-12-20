@@ -44,11 +44,12 @@ def do_entire_dir(args):
     in_format = 'vtt' 
 
     pathlist = Path(data_dir).glob('**/*.' + in_format) 
-    out_name = '.'.join(data_dir.split('.')[0:2]) + '_parsed.' + in_format
+    
+    for path in pathlist:
+        file = str(path)
+        out_name = file.split('.')[0] + '_parsed.' + in_format
 
-    with open(out_name, 'a') as f:
-        for path in pathlist:
-            file = str(path)
+        with open(out_name, 'a') as f:
             file_data = parse_file(file)
             parsed = split_to_samples(file_data, duration)
             for p in parsed:
