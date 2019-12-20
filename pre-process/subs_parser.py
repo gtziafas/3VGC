@@ -44,7 +44,6 @@ def do_entire_dir(args):
     in_format = 'vtt' 
 
     pathlist = Path(data_dir).glob('**/*.' + in_format) 
-    
     for path in pathlist:
         file = str(path)
         out_name = file.split('.')[0] + '_parsed.' + in_format
