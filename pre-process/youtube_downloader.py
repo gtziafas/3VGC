@@ -16,7 +16,7 @@ def download_video_from_url(url: str, out_dir: str) -> None:
 
     options = {
         'format'            :   'worst',
-        'outtmpl'           :   out_dir + '/%(id)s%(ext)s',
+        'outtmpl'           :   out_dir + '/%(id)s.%(ext)s',
         'writesubtitles'    :   True
     }
 
