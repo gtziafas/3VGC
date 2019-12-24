@@ -15,6 +15,7 @@ def download_video_from_url(url: str, out_dir: str) -> None:
         os.makedirs(out_dir)
 
     options = {
+        'format'            :   'worst',
         'outtmpl'           :   out_dir + '/%(id)s%(ext)s',
         'writesubtitles'    :   True
     }
