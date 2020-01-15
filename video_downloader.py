@@ -3,6 +3,8 @@ import shutil
 
 import youtube_dl
 # from vtt_to_srt import vtt_to_srt
+import csv
+import time
 import subprocess
 
 """Download a video in n second fragments"""
@@ -76,5 +78,27 @@ def download_videos(url: str, class_string: str, n_seconds: int = 30, split_vide
         pass
 
 
+def download_dataset(textfile:str, n_seconds=30):
+    label = "vlog"
+    playlist_durations = {}
+    with open(textfile) as file:
+        csv_reader = csv.reader(file, delimiter=',')
+        for row in csv_reader:
+            if row[0] == "l":
+                label = row[1]
+            elif row[0] == "p":
+                time_str = row[1]
+                time_seconds = sum(x * int(t) for x, t in zip([3600, 60, 1], time_str.split(":")))
+                if label in playlist_durations:
+                    playlist_durations[label] += time_seconds
+                else:
+                    playlist_durations[label] = time_seconds
+                # Uncomment this to activate downloading
+                # download_videos(row[2], label, n_seconds)
+    for label in playlist_durations:
+        print(label, time.strftime('%H:%M:%S', time.gmtime(playlist_durations[label])))
+
+
 if __name__ == "__main__":
-    download_videos('https://www.youtube.com/watch?v=h2uDE8TuULs', "drama", 30, split_videos=False)
+    # download_videos('https://www.youtube.com/watch?v=h2uDE8TuULs', "drama", 30, split_videos=False)
+    download_dataset("playlists.csv")
