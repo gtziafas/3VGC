@@ -6,7 +6,7 @@ from model.fusion import EarlyFusion
 class TrimodalFusionClassifier(Module):
     def __init__(self, encoders: ModuleList, model_sizes: Tuple[int, int, int], fusion_fn: tensor_map,
                  feature_sizes: Tuple[int, int, int], num_classes: int = 8, dropout_rate: float = 0.1) -> None:
-        super(TrimodalFusionNetwork, self).__init__()
+        super(TrimodalFusionClassifier, self).__init__()
         self.d_equ, self.d_hidden, self.d_fused = model_sizes[0:3]
         self.video_encoder, self.audio_encoder, self.text_encoder = encoders[0:3]
         self.dim_equ = ModuleList([Linear(feature_sizes[_], self.d_equ) for _ in range(3)])

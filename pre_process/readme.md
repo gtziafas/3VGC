@@ -1,3 +1,8 @@
+0) In Peregrine:
+```module purge```,
+```module load Python PyTorch FFmpeg OpenCV```,
+```pip install youtube_dl --user```
+
 1) Create 2 category folders in `/data/sxxxxxxx/`
 
 `cartoon`
@@ -30,4 +35,4 @@
 
 8) Run the audio extraction `python pre_process/audio_extraction.py /data/sxxxxxxx/cartoon/video/ "mp4" "mp3"`
 
-9) Run the subtitle extraction  for 5 second chunks `python pre_process/subs_parser.py /data/sxxxxxxx/cartoon/raw/ 5`
+9) Run the subtitle extraction  for 5 second chunks `python pre_process/subs_parser.py /data/sxxxxxxx/cartoon/raw/ 5 False`
