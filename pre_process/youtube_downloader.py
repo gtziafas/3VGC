@@ -22,7 +22,8 @@ def download_video_from_url(url: str, out_dir: str) -> None:
     options = {
         'format'            :   'worst',
         'outtmpl'           :   out_dir + '/%(id)s.%(ext)s',
-        'writesubtitles'    :   True
+        'writesubtitles'    :   True,
+        'writeautomaticsub' :   True
     }
 
     with youtube_dl.YoutubeDL(options) as ydl:
@@ -39,12 +40,21 @@ def split_video(file: str, dur: int, write_name: str, out_format: str) -> None:
 
 
 def split_entire_dir(data_dir: str, duration: float, in_format: str, out_format: str) -> None:
-    pathlist = Path(data_dir).glob('**/*.' + in_format) 
+    pathlist = Path(data_dir).glob('**/*.' + in_format)
+
+    crumbs = data_dir.split("/")
+    out_dir = "/".join([crumbs[0], crumbs[1]]) + "/video/"
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
     for path in pathlist:
         file = str(path)
-        #out_name = file.split('.')[0] + '_parsed.' + in_format
         print(file)
-        split_video(file, duration, 'dfsdd', out_format)
+        # break
+        crumbs = file.split("/")
+        out_name = "/".join([crumbs[0], crumbs[1]]) + "/video/" + crumbs[-1].split(".")[0] + "_parsed." + in_format
+        print(out_name)
+        # break
+        split_video(file, duration, out_name, out_format)
 
 
 def download_dataset(textfile:str, n_seconds=30):
@@ -63,6 +73,6 @@ def download_dataset(textfile:str, n_seconds=30):
                 else:
                     playlist_durations[label] = time_seconds
                 # Uncomment this to activate downloading
-                download_video_from_url(row[2], "out")
+                download_video_from_url(row[2], "out/" + label + "/raw/")
     for label in playlist_durations:
         print(label, time.strftime('%H:%M:%S', time.gmtime(playlist_durations[label])))
