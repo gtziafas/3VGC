@@ -1,13 +1,16 @@
 1) Create 2 category folders in `/data/sxxxxxxx/`
 
-`cartoon
-|raw
+`cartoon`
+`|raw
 |video
 |video_subsampled
 |audio
 |text`
+
 2) Put all your urls in `playlists.csv`
+
 3) `git clone` the repo somewhere in the `/home` folder
+
 4) From the git repo root, open the Python console:
 
 `> from pre_process.youtube_downloader import *`
