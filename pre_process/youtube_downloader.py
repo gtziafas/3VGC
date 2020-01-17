@@ -43,7 +43,7 @@ def split_entire_dir(data_dir: str, duration: float, in_format: str = 'mp4', out
     pathlist = Path(data_dir).glob('**/*.' + in_format)
 
     crumbs = data_dir.split("/")
-    out_dir = "/".join([crumbs[0], crumbs[1]]) + "/video/"
+    out_dir = "/".join(crumbs[0:5]) + "/video/"
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
