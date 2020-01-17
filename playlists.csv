@@ -1,7 +1,7 @@
 c, use l for labels and after each label use p for each playlist with duration before url (https://chrome.google.com/webstore/detail/youtube-playlist-duration/ijppgifnllaehojnpbphigenojfjnhml)
-l, vlog
-l, documentary
-l, sports
+l,vlog
+l,documentary
+l,sports
 p, 21:06       ,https://www.youtube.com/playlist?list=PL-292yfpAFGaf26ZzQqcSBJHDpVO5dr3b
 c, 52:22       ,https://www.youtube.com/playlist?list=PL-292yfpAFGbXHvKONnIhp0rQSdldpFrq
 c, 1:03:47     ,https://www.youtube.com/playlist?list=PL-292yfpAFGavO_B_i0fcmkiEzZHtD4R6
@@ -16,8 +16,8 @@ c, 37:11       ,https://www.youtube.com/playlist?list=PL-292yfpAFGZOVWmujokAuuaA
 c, 40:24       ,https://www.youtube.com/playlist?list=PL-292yfpAFGYmlIdIczF72SB_5oF7Gp7F
 c, 17:45       ,https://www.youtube.com/playlist?list=PL-292yfpAFGZocGIDHIbPJpUI0PV366nT
 c, 479:44:21   ,https://www.youtube.com/playlist?list=PLnaYFo37eXKUvS-SkkgHbMiKxFky4J7IX
-l, music
-l, commercial
-l, drama
-l, cartoon
-l, tv
+l,music
+l,commercial
+l,drama
+l,cartoon
+l,tv
