@@ -60,7 +60,7 @@ class TransformerEncoderLayer(Module):
 
 class TransformerEncoder(Module):
     def __init__(self, module_maker: Module, num_layers: int = 1, *args, **kwargs) -> None:
-        super(Encoder, self).__init__()
+        super(TransformerEncoder, self).__init__()
         self.positional_encoding = PositionalEncoding()
         self.network = Sequential(*[module_maker(*args, **kwargs) for _ in range(num_layers)])
 
