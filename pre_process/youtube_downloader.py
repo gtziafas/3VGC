@@ -63,6 +63,6 @@ def download_dataset(textfile:str, n_seconds=30):
                 else:
                     playlist_durations[label] = time_seconds
                 # Uncomment this to activate downloading
-                # download_video_from_url(row[2], "out")
+                download_video_from_url(row[2], "out")
     for label in playlist_durations:
         print(label, time.strftime('%H:%M:%S', time.gmtime(playlist_durations[label])))
