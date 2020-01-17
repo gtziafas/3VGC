@@ -4,13 +4,16 @@ from utils.utils import ModalityEncoder
 import torchaudio
 import torchaudio.transforms as tf
 
-def wav_to_mfcc(wav: Sequence[float], sample_rate: float, device: str = 'cpu') -> FloatTensor:
-	wav = torch.tensor(wav, dtype=torch.float, device=device)
-	return tf.MFCC(sample_rate)(wav)
 
-def wav_to_mel_spec(wav: Sequence[float], sample_rate:float, device: str = 'cpu') -> FloatTensor:
-	wav = torch.tensor(wav, dtype=torch.float, device=device)
-	return tf.MelSpectrogram(sample_rate)(wav) 
+def wav_to_mfcc(wav: Sequence[float], sample_rate: float, device: str = 'cpu') -> FloatTensor:
+    wav = torch.tensor(wav, dtype=torch.float, device=device)
+    return tf.MFCC(sample_rate)(wav)
+
+
+def wav_to_mel_spec(wav: Sequence[float], sample_rate: float, device: str = 'cpu') -> FloatTensor:
+    wav = torch.tensor(wav, dtype=torch.float, device=device)
+    return tf.MelSpectrogram(sample_rate)(wav)
+
 
 def wav_to_mfcc(wav: Sequence[float], sample_rate: float) -> FloatTensor:
     wav = torch.tensor(wav, dtype=torch.float)
@@ -21,7 +24,7 @@ def wav_to_mel_spec(wav: Sequence[float], sample_rate: float) -> FloatTensor:
     wav = torch.tensor(wav, dtype=torch.float)
     return tf.MelSpectrogram(sample_rate)(wav)
 
-    
+
 class DempsterShaferFusion(Module):
     def __init__(self, *args, **kwargs) -> None:
         super(DempsterShaferFusion, self).__init__()

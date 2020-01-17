@@ -2,7 +2,7 @@ import csv
 import time
 
 import youtube_dl
-import os 
+import os
 import subprocess
 
 
@@ -13,7 +13,6 @@ def get_length(input_video):
 
 
 def download_video_from_url(url: str, out_dir: str) -> None:
-
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 

@@ -6,8 +6,10 @@ from collections import defaultdict
 from pathlib import Path 
 from typing import List, Tuple
 
+
 def remove_indexing(lines: List[str]) -> List[str]:
     return list(filter(lambda l: not l.split('\n')[0].isdigit(), lines))
+
 
 def parse_file(file: str, manually_downloaded_flag: bool = False) -> List[Tuple[float, str]]:
     with open(file, 'r') as f:
@@ -17,21 +19,22 @@ def parse_file(file: str, manually_downloaded_flag: bool = False) -> List[Tuple[
     def _parse_file(lines: List[str]) -> List[Tuple[float, str]]:
         tfs, subs = defaultdict(), defaultdict()
         for i, l in enumerate(lines): 
-             if '-->' in l: 
-                 flag_char = '.' if not manually_downloaded_flag else ','
-                 tfs[i] = time.strptime(':'.join(l.split(':')[0:3]).split(' ')[0].split(flag_char)[0], '%H:%M:%S')
-                 tfs[i] = datetime.timedelta(hours=tfs[i].tm_hour, minutes=tfs[i].tm_min, seconds=tfs[i].tm_sec).total_seconds()
-             elif l[0] != '\n': 
-                 subs[i] = l.split('\n')[0] 
-                 if lines[i+1] != '\n': 
-                     subs[i] = subs[i] + ' ' + lines[i+1].split('\n')[0]  
-                     del lines[i+1] 
+            if '-->' in l:
+                flag_char = '.' if not manually_downloaded_flag else ','
+                tfs[i] = time.strptime(':'.join(l.split(':')[0:3]).split(' ')[0].split(flag_char)[0], '%H:%M:%S')
+                tfs[i] = datetime.timedelta(hours=tfs[i].tm_hour, minutes=tfs[i].tm_min, seconds=tfs[i].tm_sec).total_seconds()
+            elif l[0] != '\n':
+                subs[i] = l.split('\n')[0]
+                if lines[i+1] != '\n':
+                    subs[i] = subs[i] + ' ' + lines[i+1].split('\n')[0]
+                    del lines[i+1]
         tfs = list(tfs.values())
         subs = list(subs.values())[2:]
 
         return list(zip(tfs, subs))
 
     return _parse_file(lines)
+
 
 def split_to_samples(data: List[Tuple[float, str]], duration: float) -> List[str]:
     res = [] 
@@ -44,6 +47,7 @@ def split_to_samples(data: List[Tuple[float, str]], duration: float) -> List[str
     res.append(' '.join([l[1] for l in data[idx:i+1]]))
 
     return res 
+
 
 def do_entire_dir(args):
     # parse args
