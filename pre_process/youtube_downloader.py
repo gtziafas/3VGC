@@ -27,7 +27,7 @@ def download_video_from_url(url: str, out_dir: str) -> None:
         ydl.download([url])
 
 
-def download_dataset(textfile:str, n_seconds=30):
+def download_dataset(textfile:str, out_dir:str, n_seconds=30):
     label = "vlog"
     playlist_durations = {}
     with open(textfile) as file:
@@ -43,6 +43,6 @@ def download_dataset(textfile:str, n_seconds=30):
                 else:
                     playlist_durations[label] = time_seconds
                 # Uncomment this to activate downloading
-                download_video_from_url(row[2], "out/" + label + "/raw/")
+                download_video_from_url(row[2], out_dir + label + "/raw/")
     for label in playlist_durations:
         print(label, time.strftime('%H:%M:%S', time.gmtime(playlist_durations[label])))
