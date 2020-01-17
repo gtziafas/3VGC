@@ -1,10 +1,11 @@
 # extract audio from a video, or for all videos in directory
 # usage:    python3 audio_extraction './path/to/videos/' 'webm' 'mp3' 192000
 # last 3 args are optional with the default values shown
-import os 
+import os
 import sys
 
-from pathlib import Path 
+from pathlib import Path
+
 
 def extract_audio_from_video(file: str, bitrate: int = 192000, out_format: str = 'mp3') -> None:
     write_name = '.'.join(file.split('.')[:-1]) + '.' + out_format
@@ -14,7 +15,7 @@ def extract_audio_from_video(file: str, bitrate: int = 192000, out_format: str =
 
 
 def do_entire_dir(data_dir: str, in_format: str = 'webm', out_format: str = 'mp3', bitrate: int = 192000) -> None:
-    pathlist = Path(data_dir).glob('**/*.' + in_format) 
+    pathlist = Path(data_dir).glob('**/*.' + in_format)
     for path in pathlist:
         file = str(path)
         extract_audio_from_video(file=file, out_format=out_format, bitrate=bitrate)

@@ -1,5 +1,6 @@
 from utils.imports import *
 
+
 # wrapper for all three encoders
 class ModalityEncoder(Module):
     def __init__(self, feature_extractor: Module, d_in: int, d_out: int, *args, **kwargs) -> None:
@@ -7,14 +8,16 @@ class ModalityEncoder(Module):
         self.features = feature_extractor(*args, **kwargs)
         self.linear = Linear(d_in, d_out)
 
-    def forward(self, x:FloatTensor) -> FloatTensor:
+    def forward(self, x: FloatTensor) -> FloatTensor:
         features = self.features(x)
         out = self.linear(features)
         out = F.softmax(out, dim=-1)
 
-        return out 
-        
-# d_model -> d_ff -> d_model
+        return out
+
+    # d_model -> d_ff -> d_model
+
+
 class PositionWiseFeedForward(Module):
     def __init__(self, d_model: int, activation_fn: tensor_map, d_ff: int, dropout_rate: float = 0.1) -> None:
         super(PositionWiseFeedForward, self).__init__()
@@ -26,8 +29,9 @@ class PositionWiseFeedForward(Module):
     def forward(self, x):
         w1 = self.w_1(x)
         w1 = F.dropout(self.activation_fn(w1), self.dropout_rate)
-        
+
         return self.w_2(w1)
+
 
 # attn(Q,K,V) = softmax( Q @ K.T / sqrt(d_k) ) @ V
 def scaled_dot_product(queries: FloatTensor, keys: FloatTensor, values: FloatTensor,
@@ -41,6 +45,7 @@ def scaled_dot_product(queries: FloatTensor, keys: FloatTensor, values: FloatTen
     weights = F.softmax(weights, dim=-1)  # [B, M, N] -- each m thing attends a probability distribution over N things
     return torch.bmm(weights, values)
 
+
 # mha(Q,K,V) = h x attn(Q @ W_1, K @ W_2, V @ W_3) @ W_0
 def multihead_attn_fn(queries: FloatTensor, keys: FloatTensor, values: FloatTensor,
                       qts: tensor_maps, kts: tensor_maps, vts: tensor_maps, wo: tensor_map,
@@ -51,6 +56,7 @@ def multihead_attn_fn(queries: FloatTensor, keys: FloatTensor, values: FloatTens
     outputs = [scaled_dot_product(qs[i], ks[i], vs[i], mask) for i in range(len(qs))]
     outputs = F.dropout(torch.cat(outputs, dim=-1), dropout_rate)
     return wo(outputs)
+
 
 class MultiHeadAttention(Module):
     def __init__(self, num_heads: int, d_model: int, d_k: int, d_v: int) -> None:
@@ -68,6 +74,7 @@ class MultiHeadAttention(Module):
         return multihead_attn_fn(queries, keys, values, self.q_transformations, self.k_transformations,
                                  self.v_transformations, self.Wo, mask)
 
+
 # x -> x + pe(x)
 class PositionalEncoding(Module):
     def __init__(self, freq: int = 10000, dropout_rate: float = 0.1) -> None:
@@ -76,7 +83,7 @@ class PositionalEncoding(Module):
         self.dropout_rate = dropout_rate
 
     def forward(self, x: FloatTensor) -> FloatTensor:
-        b, n , d_model = x.shape[0:3]
+        b, n, d_model = x.shape[0:3]
         pe = torch.zeros(n, d_model, device=x.device)
         position = torch.arange(0, n, device=x.device, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, d_model, 2, device=x.device, dtype=torch.float) *
@@ -87,17 +94,18 @@ class PositionalEncoding(Module):
 
         return F.dropout(pe, self.dropout_rate) + x
 
-# plot training and validation losses 
+
+# plot training and validation losses
 def plot_losses(losses: List[Tuple[float, float]]) -> None:
     train_losses = list(map(lambda l: l[0], losses))
-    val_losses = list(map(lambda l : l[1], losses))
+    val_losses = list(map(lambda l: l[1], losses))
     num_epochs = len(train_losses)
 
-    import matplotlib.pyplot as plt 
+    import matplotlib.pyplot as plt
     plt.title('Training progress over {} epochs'.format(num_epochs))
     plt.xlabel('epochs')
     plt.ylabel('cross-entropy loss')
-    plt.plot(list(range(1, num_epochs+1)), train_losses, label='train')
-    plt.plot(list(range(1, num_epochs+1)), val_losses, label='eval')
+    plt.plot(list(range(1, num_epochs + 1)), train_losses, label='train')
+    plt.plot(list(range(1, num_epochs + 1)), val_losses, label='eval')
     plt.legend()
     plt.show()

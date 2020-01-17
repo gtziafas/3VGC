@@ -1,3 +1,6 @@
 youtube_dl
 numpy
 opencv-python
+torch
+torchaudio
+matplotlib
