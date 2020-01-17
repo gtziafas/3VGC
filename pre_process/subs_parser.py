@@ -21,7 +21,7 @@ def parse_file(file: str, manually_downloaded_flag: bool = False) -> List[Tuple[
         for i, l in enumerate(lines): 
             if '-->' in l:
                 flag_char = '.' if not manually_downloaded_flag else ','
-                tfs[i] = time.strptime(':'.join(l.split(':')[0:3]).split(' ')[0].split(',')[0], '%H:%M:%S')
+                tfs[i] = time.strptime(':'.join(l.split(':')[0:3]).split(' ')[0].split('.')[0], '%H:%M:%S')
                 tfs[i] = datetime.timedelta(hours=tfs[i].tm_hour, minutes=tfs[i].tm_min, seconds=tfs[i].tm_sec).total_seconds()
             elif l[0] != '\n':
                 subs[i] = l.split('\n')[0]
