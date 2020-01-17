@@ -1,8 +1,12 @@
+import csv
+import time
+
 import youtube_dl
 import os 
 import subprocess
 
 from pathlib import Path
+
 
 def get_length(input_video):
     result = subprocess.check_output(['ffprobe', '-i', input_video, '-show_entries', 'format=duration', '-v', 'quiet',
@@ -43,3 +47,22 @@ def split_entire_dir(data_dir: str, duration: float, in_format: str, out_format:
         split_video(file, duration, 'dfsdd', out_format)
 
 
+def download_dataset(textfile:str, n_seconds=30):
+    label = "vlog"
+    playlist_durations = {}
+    with open(textfile) as file:
+        csv_reader = csv.reader(file, delimiter=',')
+        for row in csv_reader:
+            if row[0] == "l":
+                label = row[1]
+            elif row[0] == "p":
+                time_str = row[1]
+                time_seconds = sum(x * int(t) for x, t in zip([3600, 60, 1], time_str.split(":")))
+                if label in playlist_durations:
+                    playlist_durations[label] += time_seconds
+                else:
+                    playlist_durations[label] = time_seconds
+                # Uncomment this to activate downloading
+                # download_video_from_url(row[2], "out")
+    for label in playlist_durations:
+        print(label, time.strftime('%H:%M:%S', time.gmtime(playlist_durations[label])))
