@@ -1,6 +1,6 @@
 0) In Peregrine:
-```module purge```
-```module load Python PyTorch FFmpeg OpenCV```
+```module purge```,
+```module load Python PyTorch FFmpeg OpenCV```,
 ```pip install youtube_dl --user```
 
 1) Create 2 category folders in `/data/sxxxxxxx/`
