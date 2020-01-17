@@ -8,9 +8,10 @@ from pathlib import Path
 
 
 def extract_audio_from_video(file: str, bitrate: int = 192000, out_format: str = 'mp3') -> None:
-    write_name = '.'.join(file.split('.')[:-1]) + '.' + out_format
-    print(file)
-    print(write_name)
+    crumbs = file.split("/")
+    write_name = "/".join(crumbs[0:5]) + "/audio/" + crumbs[-1].split(".")[0] + '.' + out_format
+    #print(file)
+    #print(write_name)
     os.system('ffmpeg -i ' + file + ' -f ' + out_format + ' -ab ' + str(bitrate) + ' -vn ' + write_name)
 
 
