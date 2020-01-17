@@ -15,13 +15,15 @@
 4) From the git repo root, open the Python console:
 
 `> from pre_process.youtube_downloader import *`
+
 `> download_dataset(textfile="playlists.csv")`
 5) Convert all downloaded videos to `.mp4` using `ffmpeg`
 `for i in *.webm; do ffmpeg -i "$i" "${i%.*}.mp4"; done`
 
 6) Open up the console like in step 4
 
-`from pre_process.youtube_downloader import *`
+`> from pre_process.youtube_downloader import *`
+
 `> split_entire_dir(data_dir="/data/sxxxxxxx/cartoon/raw/", duration=5, in_format="mp4", out_format="mp4")`
 
 7) Subsample videos to keep only 4 frames per sec. Run `python pre_process/subsample_videos.py * 20 'mp4' 'mp4'`
