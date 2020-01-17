@@ -21,7 +21,8 @@
 
 `> from pre_process.youtube_downloader import *`
 
-`> download_dataset(textfile="playlists.csv")`
+`> download_dataset(textfile="playlists.csv", out_dir = "/data/sxxxxxx/cartoon/raw")
+`
 5) Convert all downloaded videos to `.mp4` using `ffmpeg`
 `for i in *.webm; do ffmpeg -i "$i" "${i%.*}.mp4"; done`
 
