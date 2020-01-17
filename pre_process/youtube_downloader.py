@@ -51,7 +51,7 @@ def split_entire_dir(data_dir: str, duration: float, in_format: str, out_format:
         print(file)
         # break
         crumbs = file.split("/")
-        out_name = "/".join([crumbs[0], crumbs[1]]) + "/video/" + crumbs[-1].split(".")[0] + "_parsed." + in_format
+        out_name = "/".join([crumbs[0], crumbs[1]]) + "/video/" + crumbs[-1].split(".")[0] + "_parsed"
         print(out_name)
         # break
         split_video(file, duration, out_name, out_format)
