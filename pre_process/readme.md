@@ -7,8 +7,6 @@
 
 1) Create 2 category folders in `/data/sxxxxxxx/`
 
-`cartoon`
-
 `|raw
 |video
 |video_subsampled
