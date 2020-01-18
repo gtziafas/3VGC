@@ -29,7 +29,8 @@
 6) Run the following script to split all videos in your data folders into 5 second duration samples:
 `python pre_process/split_videos.py 5 mp4 mp4`
 
-7) Subsample videos to keep only 4 frames per sec. Run `python pre_process/subsample_videos.py * 20 'mp4' 'mp4'`
+7) Subsample videos to keep only 4 frames per sec. Run:
+`python pre_process/subsample_videos.py /data/sxxxxxx/cartoon/video 20 'mp4' 'mp4'`
 
 8) Run the audio extraction `python pre_process/audio_extraction.py /data/sxxxxxxx/cartoon/video/ "mp4" "mp3"`
 
