@@ -26,11 +26,8 @@
 5) Convert all downloaded videos to `.mp4` using ffmpeg:
  `for i in *.webm; do ffmpeg -i "$i" "${i%.*}.mp4"; done`
 
-6) Open up the console like in step 4
-
-`> from pre_process.youtube_downloader import *`
-
-`> split_entire_dir(data_dir="/data/sxxxxxxx/cartoon/raw/", duration=5, in_format="mp4", out_format="mp4")`
+6) Run the following script to split all videos in your data folders into 5 second duration samples:
+`python pre_process/split_videos.py 5 mp4 mp4`
 
 7) Subsample videos to keep only 4 frames per sec. Run `python pre_process/subsample_videos.py * 20 'mp4' 'mp4'`
 
