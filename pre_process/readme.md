@@ -1,11 +1,11 @@
+# Usage
+
 0) In Peregrine:
 ```module purge```,
 ```module load Python PyTorch FFmpeg OpenCV```,
 ```pip install youtube_dl --user```
 
 1) Create 2 category folders in `/data/sxxxxxxx/`
-
-`cartoon`
 
 `|raw
 |video
@@ -21,17 +21,16 @@
 
 `> from pre_process.youtube_downloader import *`
 
-`> download_dataset(textfile="playlists.csv")`
-5) Convert all downloaded videos to `.mp4` using `ffmpeg`
-`for i in *.webm; do ffmpeg -i "$i" "${i%.*}.mp4"; done`
+`> download_dataset(textfile="playlists.csv", out_dir = "/data/sxxxxxx/cartoon/raw")`,
 
-6) Open up the console like in step 4
+5) Convert all downloaded videos to `.mp4` using ffmpeg:
+ `for i in *.webm; do ffmpeg -i "$i" "${i%.*}.mp4"; done`
 
-`> from pre_process.youtube_downloader import *`
+6) Run the following script to split all videos in your data folders into 5 second duration samples:
+`python pre_process/split_videos.py 5 mp4 mp4`
 
-`> split_entire_dir(data_dir="/data/sxxxxxxx/cartoon/raw/", duration=5, in_format="mp4", out_format="mp4")`
-
-7) Subsample videos to keep only 4 frames per sec. Run `python pre_process/subsample_videos.py * 20 'mp4' 'mp4'`
+7) Subsample videos to keep only 4 frames per sec. Run:
+`python pre_process/subsample_videos.py /data/sxxxxxx/cartoon/video 20 'mp4' 'mp4'`
 
 8) Run the audio extraction `python pre_process/audio_extraction.py /data/sxxxxxxx/cartoon/video/ "mp4" "mp3"`
 
