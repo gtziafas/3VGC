@@ -1,5 +1,4 @@
 import csv
-import time
 
 import youtube_dl
 import os
@@ -45,4 +44,6 @@ def download_dataset(textfile:str, out_dir:str, n_seconds=30):
                 # Uncomment this to activate downloading
                 download_video_from_url(row[2], out_dir + label + "/raw/")
     for label in playlist_durations:
-        print(label, time.strftime('%H:%M:%S', time.gmtime(playlist_durations[label])))
+        m, s = divmod(playlist_durations[label], 60)
+        h, m = divmod(m, 60)
+        print(label, f'{h:d}:{m:02d}:{s:02d}')
