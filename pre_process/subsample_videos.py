@@ -41,6 +41,10 @@ def subsample_video(path: str, total_frames: int, out_format: str):
 
     # init video saver oject
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    try:
+        os.mkdir(pre + '/' + dirname + '_subsampled/')
+    except:
+        pass
     out_name = pre + '/' + dirname + '_subsampled/' + filename + '_subsampled.' + out_format
     out = cv2.VideoWriter(out_name, fourcc, fps, (width, height))
 
