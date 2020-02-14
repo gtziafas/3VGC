@@ -15,7 +15,22 @@ class ModalityEncoder(Module):
 
         return out
 
-    # d_model -> d_ff -> d_model
+
+# wrapper for all three unimodal classifiers
+class ModalityClassifier(Module):
+    def __init__(self, layer_dims: Tuple[int], activation_fn: tensor_map, dropout_rate: float = 0.2, num_classes: int = 8) -> None:
+        self.depth = len(layer_dims)
+        self.activation_fn = activation_fn 
+        self.dropout_rate = dropout_rate 
+
+        self.ws = ModuleList(list(map(lambda d: Linear(self.layer_dims[d], self.layer_dims[d+1]), range(self.depth-1))))
+        self.ws.append(Linear(self.layer_dims[-1], num_classes))
+
+    def forward(self, x: FloatTensor) -> FloatTensor: 
+        for d in self.depth:
+            x = F.dropout(self.activation_fn(self.ws[d](x)), self.dropout_rate)
+
+        return self.ws[-1](x)
 
 
 class PositionWiseFeedForward(Module):
@@ -95,17 +110,3 @@ class PositionalEncoding(Module):
         return F.dropout(pe, self.dropout_rate) + x
 
 
-# plot training and validation losses
-def plot_losses(losses: List[Tuple[float, float]]) -> None:
-    train_losses = list(map(lambda l: l[0], losses))
-    val_losses = list(map(lambda l: l[1], losses))
-    num_epochs = len(train_losses)
-
-    import matplotlib.pyplot as plt
-    plt.title('Training progress over {} epochs'.format(num_epochs))
-    plt.xlabel('epochs')
-    plt.ylabel('cross-entropy loss')
-    plt.plot(list(range(1, num_epochs + 1)), train_losses, label='train')
-    plt.plot(list(range(1, num_epochs + 1)), val_losses, label='eval')
-    plt.legend()
-    plt.show()

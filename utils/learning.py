@@ -78,3 +78,18 @@ def train_model(model: Module, train_dl: DataLoader, val_dl: DataLoader, loss_fn
     print('\nFinished training..')
 
     return losses
+
+# plot training and validation losses
+def plot_losses(losses: List[Tuple[float, float]]) -> None:
+    train_losses = list(map(lambda l: l[0], losses))
+    val_losses = list(map(lambda l: l[1], losses))
+    num_epochs = len(train_losses)
+
+    import matplotlib.pyplot as plt
+    plt.title('Training progress over {} epochs'.format(num_epochs))
+    plt.xlabel('epochs')
+    plt.ylabel('cross-entropy loss')
+    plt.plot(list(range(1, num_epochs + 1)), train_losses, label='train')
+    plt.plot(list(range(1, num_epochs + 1)), val_losses, label='eval')
+    plt.legend()
+    plt.show()

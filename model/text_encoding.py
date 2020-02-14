@@ -1,5 +1,5 @@
 from utils.imports import *
-from utils.utils import PositionWiseFeedForward, MultiHeadAttention, PositionalEncoding, ModalityEncoder
+from utils.utils import *
 
 
 # extract features from text with 1D convolutions ??
@@ -69,7 +69,29 @@ class TransformerEncoder(Module):
         return self.network((x, mask))[0]
 
 
-def txt_example():
+def default_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: int = 8):
+    encoder = ModalityEncoder(feature_extractor=CNN1D, d_in = dt_in, d_out = dt_out,
+                              activation_fn = F.gelu, num_channels = 100, 
+                              kernel_sizes=(3, 4, 3))
+
+    classifier = ModalityClassifier(layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
+    return Sequential(encoder, classifier)
+
+
+def attention_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: int = 8):
+    transformer_enc = TransformerEncoder(module_maker=TransformerEncoderLayer, num_layers=1,
+                                         vector_size=300)
+
+    cnn1d_enc = CNN1D(activation_fn=F.gelu, num_channels=100, kernel_sizes=(3,4,3))
+
+    encoder = ModalityEncoder(feature_extractor=Sequential(transformer_enc, cnn1d_enc),
+                              d_in = dt_in, d_out = dt_out)
+
+    classifier = ModalityClassifier(layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
+    return Sequential(encoder, classifier)
+
+
+def text_example():
     d_t = 1024
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
