@@ -43,8 +43,8 @@ class CNN3D(Module):
 
 def video_example():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    frames, height, width = 20, 64, 64  # no frames, frame height, frame width 
-    batch_size = 4 
+    frames, height, width = 40, 64, 64  # no frames, frame height, frame width 
+    batch_size = 1
     d_v = 2304
 
     # noise video input
@@ -54,8 +54,8 @@ def video_example():
     video_encoder = ModalityEncoder(feature_extractor=CNN3D,
                                     d_in = d_v , d_out = 300,
                                     activation_fn = GeLU(),
-                                    num_channels = 32, 
-                                    kernel_sizes = [(4,3)])
+                                    num_channels = 64, 
+                                    kernel_sizes = [(3,2), (3,2)])
     classifier = Sequential(video_encoder, Linear(300, 8)).to(device)
 
     # placeholding results - no softmax
