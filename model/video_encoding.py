@@ -34,7 +34,7 @@ class CNN3D(Module):
 
     def temp(self, x: FloatTensor) -> FloatTensor:
         for k in range(len(self.feature_list)):
-            x = self.feature_list[k]
+            x = self.feature_list[k](x)
             print(x.shape)
         return x.view(x.shape[0], -1)
 
