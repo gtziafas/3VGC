@@ -15,7 +15,7 @@ class CNN3D(Module):
                         pool_kernel=kernel_sizes[0][1])]
         self.feature_list[1:] = [self.conv_block(in_channels = self.num_channels*(d+1), out_channels = self.num_channels*(d+2),
                             conv_kernel=kernel_sizes[d+1][0], pool_kernel=kernel_sizes[d+1][1]) for d in range(self.depth-1)]
-        self.features.append(self.conv_block(in_channels = self.num_channels*(self.depth), out_channels = self.num_channels*self.depth,
+        self.feature_list.append(self.conv_block(in_channels = self.num_channels*(self.depth), out_channels = self.num_channels*self.depth,
                             conv_kernel=kernel_sizes[self.depth-1][0], pool_kernel=kernel_sizes[self.depth-1][1]))
         self.features = Sequential(*self.feature_list)
 
