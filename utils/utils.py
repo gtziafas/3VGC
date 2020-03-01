@@ -110,3 +110,10 @@ class PositionalEncoding(Module):
         return F.dropout(pe, self.dropout_rate) + x
 
 
+# the gelu activation fn 
+class GeLU(Module):
+    def __init__(self) -> None:
+        super(GeLU, self).__init__() 
+
+    def forward(self, x: FloatTensor) -> FloatTensor:
+        return F.gelu()
