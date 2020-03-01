@@ -28,7 +28,7 @@ class CNN3D(Module):
     def forward(self, x: FloatTensor) -> FloatTensor:
         batch_size = x.shape[0]
 
-        x =  self.activation_fn(self.features(x)) # multiple feature maps
+        x = self.features(x) # multiple feature maps
         x = x.view(batch_size, -1) # flatten for linear projection
         return x
 

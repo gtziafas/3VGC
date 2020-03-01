@@ -116,4 +116,4 @@ class GeLU(Module):
         super(GeLU, self).__init__() 
 
     def forward(self, x: FloatTensor) -> FloatTensor:
-        return F.gelu()
+        return F.gelu(x)
