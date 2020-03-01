@@ -9,9 +9,8 @@ class ModalityEncoder(Module):
         self.linear = Linear(in_features=d_in, out_features=d_out)
 
     def forward(self, x: FloatTensor) -> FloatTensor:
-        batch_size = x.shape[0]
         features = self.features(x)
-        out = self.linear(features.view(batch_size, -1))
+        out = self.linear(features)
         out = F.softmax(out, dim=-1)
 
         return out
