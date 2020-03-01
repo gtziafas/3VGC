@@ -6,11 +6,12 @@ class ModalityEncoder(Module):
     def __init__(self, feature_extractor: Module, d_in: int, d_out: int, *args, **kwargs) -> None:
         super(ModalityEncoder, self).__init__()
         self.features = feature_extractor(*args, **kwargs)
-        self.linear = Linear(d_in, d_out)
+        self.linear = Linear(in_features=d_in, out_features=d_out)
 
     def forward(self, x: FloatTensor) -> FloatTensor:
+        batch_size = x.shape[0]
         features = self.features(x)
-        out = self.linear(features)
+        out = self.linear(features.view(batch_size, -1))
         out = F.softmax(out, dim=-1)
 
         return out
