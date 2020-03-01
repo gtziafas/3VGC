@@ -32,6 +32,12 @@ class CNN3D(Module):
         x = x.view(batch_size, -1) # flatten for linear projection
         return x
 
+    def temp(self, x: FloatTensor) -> FloatTensor:
+        for k in len(self.feature_list):
+            x = self.feature_list[k]
+            print(x.shape)
+        return x.view(x.shape[0], -1)
+
 
 def video_example():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
