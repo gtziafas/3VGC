@@ -79,6 +79,7 @@ def load_features_into_data(waveform, data, labels, file_number, file_name):
 
 
 # Reading the data
+# TODO: make a data loader
 train_directory = '/data/s4120310/train_audio_data'
 test_directory = '/data/s4120310/test_audio_data'
 
