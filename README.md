@@ -1,4 +1,5 @@
-A Tri-Modal Video Genre Classification Dataset 
+A Tri-Modal Video Genre Classification
+
 Deep Learning 2020 - Goals
 
 0. Regroup for data loading- Friday
