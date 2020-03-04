@@ -1,3 +1,4 @@
+librosa
 youtube_dl
 numpy
 opencv-python
