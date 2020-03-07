@@ -30,7 +30,7 @@
 `python pre_process/split_videos.py /data/sxxxxxx/cartoon/video/raw 5 mp4 mp4`
 
 7) Subsample videos to keep only 4 frames per sec. Run:
-`python pre_process/subsample_videos.py /data/sxxxxxx/cartoon/video 20 'mp4' 'mp4'`
+`python pre_process/subsample_videos.py /data/sxxxxxx/cartoon/video 20 'mp4' 'mp4' False`
 
 8) Run the audio extraction `python pre_process/audio_extraction.py /data/sxxxxxxx/cartoon/video/ "mp4" "mp3"`
 
