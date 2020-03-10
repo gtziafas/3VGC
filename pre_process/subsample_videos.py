@@ -40,7 +40,7 @@ def subsample_video(path: str, total_frames: int, out_format: str):
     cap.release()
 
     # init video saver oject
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     try:
         os.mkdir(pre + '/' + dirname + '_subsampled/')
     except:
