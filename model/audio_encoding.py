@@ -73,7 +73,8 @@ class CNN2D(Module):
         self.linear = Linear(in_features=25344, out_features=2048)
         self.dropout_rate = dropout_rate
 
-    def conv_block(self, in_channels: int, out_channels: int, conv_kernel: int, conv_stride: int,
+    @staticmethod
+    def conv_block(in_channels: int, out_channels: int, conv_kernel: int, conv_stride: int,
                    pool_kernel: int = 0) -> Module:
         block = [
             Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=conv_kernel, stride=conv_stride),

@@ -1,4 +1,3 @@
-from utils.imports import *
 from utils.utils import *
 
 
@@ -15,7 +14,8 @@ class CNN1D(Module):
         self.conv2 = self.conv_block(in_channels=num_channels, out_channels=num_channels,
                                      conv_kernel=kernel_sizes[2], conv_stride=kernel_sizes[2])
 
-    def conv_block(self, in_channels: int, out_channels: int, conv_kernel: int, conv_stride: int,
+    @staticmethod
+    def conv_block(in_channels: int, out_channels: int, conv_kernel: int, conv_stride: int,
                    pool_kernel: int = 2) -> Module:
         return Sequential(
             Conv1d(in_channels=in_channels, out_channels=out_channels, kernel_size=conv_kernel, stride=conv_stride),
@@ -74,12 +74,12 @@ def default_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: int 
                               activation_fn = F.gelu, num_channels = 100, 
                               kernel_sizes=(3, 4, 3))
 
-    classifier = ModalityClassifier(layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
+    classifier = ModalityClassifier(num_classes=num_classes, layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
     return Sequential(encoder, classifier)
 
 
 def attention_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: int = 8):
-    transformer_enc = TransformerEncoder(module_maker=TransformerEncoderLayer, num_layers=1,
+    transformer_enc = TransformerEncoder(nummodule_maker=TransformerEncoderLayer, num_layers=1,
                                          vector_size=300)
 
     cnn1d_enc = CNN1D(activation_fn=F.gelu, num_channels=100, kernel_sizes=(3,4,3))
@@ -87,7 +87,7 @@ def attention_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: in
     encoder = ModalityEncoder(feature_extractor=Sequential(transformer_enc, cnn1d_enc),
                               d_in = dt_in, d_out = dt_out)
 
-    classifier = ModalityClassifier(layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
+    classifier = ModalityClassifier(num_classes=num_classes, layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
     return Sequential(encoder, classifier)
 
 

@@ -16,7 +16,8 @@ class CNN3D(Module):
                             conv_kernel=kernel_sizes[d+1][0], pool_kernel=kernel_sizes[d+1][1]) for d in range(self.depth-1)]
         self.features = Sequential(*self.feature_list)
 
-    def conv_block(self, in_channels: int, out_channels: int, conv_kernel: int, pool_kernel: int,
+    @staticmethod
+    def conv_block(in_channels: int, out_channels: int, conv_kernel: int, pool_kernel: int,
                    conv_stride: int = 2) -> Module:
         return Sequential(
             Conv3d(in_channels=in_channels, out_channels=out_channels, kernel_size=conv_kernel, stride=conv_stride),

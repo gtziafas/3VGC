@@ -24,11 +24,11 @@ def shuffle_chunk(chunk: TextSamples) -> TextSamples:
 # define an abstract DataLoader class
 class DataLoader(ABC):
     @abstractmethod
-    def __next__(self) -> Sample:
+    def __next__(self) -> TextSample:
         pass
 
     @abstractmethod
-    def get_batch(self) -> Samples:
+    def get_batch(self) -> TextSamples:
         pass
 
     @abstractmethod
@@ -46,9 +46,9 @@ def AudioDataset():
 
 # a custom lazy DataLoader class for loading text samples as sequences of strings
 class TextDataLoader(DataLoader):
-    def __init__(self, filepath: str, chunk_size: int, batch_size: int, post_proc: Callable[[Samples], Any]) -> None:
+    def __init__(self, filepath: str, chunk_size: int, batch_size: int, post_proc: Callable[[TextSamples], Any]) -> None:
         self.filepath = filepath
-        self.line_iterator = open(self.filepath. 'r')
+        self.line_iterator = open(self.filepath,'r')
         self.batch_size = batch_size
         self.chunk_size = chunk_size
         self.chunk = self.get_contiguous_chunk

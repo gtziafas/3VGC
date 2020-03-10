@@ -1,11 +1,6 @@
-import csv
-import sys
-import time
-
-import youtube_dl
 import os
 import subprocess
-
+import sys
 from pathlib import Path
 
 

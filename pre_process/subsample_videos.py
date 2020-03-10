@@ -66,7 +66,7 @@ def do_entire_dir(args):
     total_frames = int(args[2])  # total number of frames that left after sub-sampling
     in_format = args[3]  # input video format (default: '.mkv')
     out_format = args[4]  # output video format (default: '.mkv')
-    save_to_pickle = False if args[5] == None else args[5]
+    save_to_pickle = False if args[5] is None else args[5]
 
     # subsample all videos in data_dir
     pathlist = Path(data_dir).glob('**/*.' + in_format)

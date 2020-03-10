@@ -18,7 +18,9 @@ class ModalityEncoder(Module):
 
 # wrapper for all three unimodal classifiers
 class ModalityClassifier(Module):
-    def __init__(self, layer_dims: Tuple[int], activation_fn: tensor_map, dropout_rate: float = 0.2, num_classes: int = 8) -> None:
+    def __init__(self, layer_dims: Tuple[int], activation_fn: tensor_map, dropout_rate: float = 0.2,
+                 num_classes: int = 8) -> None:
+        super().__init__()
         self.depth = len(layer_dims)
         self.activation_fn = activation_fn 
         self.dropout_rate = dropout_rate 
@@ -27,7 +29,7 @@ class ModalityClassifier(Module):
         self.ws.append(Linear(self.layer_dims[-1], num_classes))
 
     def forward(self, x: FloatTensor) -> FloatTensor: 
-        for d in self.depth:
+        for d in range(self.depth):
             x = F.dropout(self.activation_fn(self.ws[d](x)), self.dropout_rate)
 
         return self.ws[-1](x)
