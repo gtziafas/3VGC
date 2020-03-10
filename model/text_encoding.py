@@ -70,11 +70,11 @@ class TransformerEncoder(Module):
 
 
 def default_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: int = 8):
-    encoder = ModalityEncoder(feature_extractor=CNN1D, d_in = dt_in, d_out = dt_out,
-                              activation_fn = F.gelu, num_channels = 100, 
+    encoder = ModalityEncoder(feature_extractor=CNN1D, d_in=dt_in, d_out=dt_out,
+                              activation_fn=F.gelu, num_channels=100,
                               kernel_sizes=(3, 4, 3))
 
-    classifier = ModalityClassifier(num_classes=num_classes, layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
+    classifier = ModalityClassifier(num_classes=num_classes, layer_dims=(dt_out, int(t_out / 3), int(dt_out / 8)))
     return Sequential(encoder, classifier)
 
 
@@ -82,12 +82,12 @@ def attention_text_model(dt_in: int = 24900, dt_out: int = 8000, num_classes: in
     transformer_enc = TransformerEncoder(nummodule_maker=TransformerEncoderLayer, num_layers=1,
                                          vector_size=300)
 
-    cnn1d_enc = CNN1D(activation_fn=F.gelu, num_channels=100, kernel_sizes=(3,4,3))
+    cnn1d_enc = CNN1D(activation_fn=F.gelu, num_channels=100, kernel_sizes=(3, 4, 3))
 
     encoder = ModalityEncoder(feature_extractor=Sequential(transformer_enc, cnn1d_enc),
-                              d_in = dt_in, d_out = dt_out)
+                              d_in=dt_in, d_out=dt_out)
 
-    classifier = ModalityClassifier(num_classes=num_classes, layer_dims = (dt_out, int(t_out/3), int(dt_out /8)))
+    classifier = ModalityClassifier(num_classes=num_classes, layer_dims=(dt_out, int(t_out / 3), int(dt_out / 8)))
     return Sequential(encoder, classifier)
 
 

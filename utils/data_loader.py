@@ -1,10 +1,11 @@
-from utils.imports import * 
+from utils.imports import *
 
 from random import sample
-from abc import abstractmethod, ABC 
+from abc import abstractmethod, ABC
 
 # GloVe word embeddings
-import spacy 
+import spacy
+
 nlp = spacy.load('en_core_web_md')
 
 # path to data in Peregrine 
@@ -41,14 +42,15 @@ def VideoDataset():
 
 
 def AudioDataset():
-    pass 
+    pass
 
 
 # a custom lazy DataLoader class for loading text samples as sequences of strings
 class TextDataLoader(DataLoader):
-    def __init__(self, filepath: str, chunk_size: int, batch_size: int, post_proc: Callable[[TextSamples], Any]) -> None:
+    def __init__(self, filepath: str, chunk_size: int, batch_size: int,
+                 post_proc: Callable[[TextSamples], Any]) -> None:
         self.filepath = filepath
-        self.line_iterator = open(self.filepath,'r')
+        self.line_iterator = open(self.filepath, 'r')
         self.batch_size = batch_size
         self.chunk_size = chunk_size
         self.chunk = self.get_contiguous_chunk
@@ -59,7 +61,7 @@ class TextDataLoader(DataLoader):
         return iter(shuffle_chunk([parse(self.get_next_line()) for _ in range(self.chunk_size)]))
 
     # get next training sample, or restart from top if reached the end
-    def get_next_line(self) -> str: 
+    def get_next_line(self) -> str:
         try:
             return self.line_iterator.__next__()
         except StopIteration:
@@ -81,9 +83,8 @@ class TextDataLoader(DataLoader):
 
 
 # a TextDataLoader for our text dataset, wrapped to give SpaCy word vectors
-def default_text_dataloader(path: str = text_data_path, chunk_size: int = 10000, 
-                            batch_size: int = 64, len_threshold: int = 25) -> TextDataLoader:    
-
+def default_text_dataloader(path: str = text_data_path, chunk_size: int = 10000,
+                            batch_size: int = 64, len_threshold: int = 25) -> TextDataLoader:
     # convert input strings to GLoVe vectors
     def glove_embeddings(sentences: TextSamples) -> FloatTensors:
         sentences = list(filter(lambda sentence: len(sentence) < len_threshold, sentences))

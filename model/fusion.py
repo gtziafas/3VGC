@@ -37,5 +37,5 @@ class TensorFusion(Module):
         outter_3d = torch.ger(outter_2d.flatten(), vectors[2]).view(batch_size, vector_size, vector_size, vector_size)
 
         return outter_3d
-        
+
 # TODO: HierarchicalFusion

@@ -22,13 +22,14 @@ class ModalityClassifier(Module):
                  num_classes: int = 8) -> None:
         super().__init__()
         self.depth = len(layer_dims)
-        self.activation_fn = activation_fn 
-        self.dropout_rate = dropout_rate 
+        self.activation_fn = activation_fn
+        self.dropout_rate = dropout_rate
 
-        self.ws = ModuleList(list(map(lambda d: Linear(self.layer_dims[d], self.layer_dims[d+1]), range(self.depth-1))))
+        self.ws = ModuleList(
+            list(map(lambda d: Linear(self.layer_dims[d], self.layer_dims[d + 1]), range(self.depth - 1))))
         self.ws.append(Linear(self.layer_dims[-1], num_classes))
 
-    def forward(self, x: FloatTensor) -> FloatTensor: 
+    def forward(self, x: FloatTensor) -> FloatTensor:
         for d in range(self.depth):
             x = F.dropout(self.activation_fn(self.ws[d](x)), self.dropout_rate)
 
@@ -110,5 +111,3 @@ class PositionalEncoding(Module):
         pe = pe.repeat(b, 1, 1)
 
         return F.dropout(pe, self.dropout_rate) + x
-
-

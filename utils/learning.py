@@ -79,6 +79,7 @@ def train_model(model: Module, train_dl: DataLoader, val_dl: DataLoader, loss_fn
 
     return losses
 
+
 # plot training and validation losses
 def plot_losses(losses: List[Tuple[float, float]]) -> None:
     train_losses = list(map(lambda l: l[0], losses))
