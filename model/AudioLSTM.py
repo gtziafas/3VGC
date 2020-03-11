@@ -6,13 +6,16 @@ Created on Sat Jan 25 11:42:00 2020
 """
 
 import os
+import random
+from math import ceil
+from pathlib import Path
+
 import librosa
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from pathlib import Path
 
 train_on_gpu = torch.cuda.is_available()
 if train_on_gpu:
@@ -82,13 +85,36 @@ def load_features_into_data(waveform, data, labels, file_number, file_name):
 # TODO: make a data loader
 train_directory = '/data/s4120310/train_audio_data'
 test_directory = '/data/s4120310/test_audio_data'
+data_directory = '/data/s4161947/sports/audio'
 
 
-def get_data(train_dir=train_directory, test_dir=test_directory):
-    train_pathlist = Path(train_dir).glob('**/*')
-    test_pathlist = Path(test_dir).glob('**/*')
-    n_train = len(next(os.walk(train_dir)))
-    n_test = len(next(os.walk(test_dir)))
+def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_directory, shuffle_seed=None):
+    # train_pathlist = Path(train_dir).glob('**/*')
+    # test_pathlist = Path(test_dir).glob('**/*')
+
+    # n_train = len(next(os.walk(train_dir)))
+    # n_test = len(next(os.walk(test_dir)))
+
+    pathlist = Path(data_dir).glob('**/*')
+
+    data_size = len(next(os.walk(data_dir)))
+
+    n_train = int(ceil(data_size * 8/10))
+    n_test = data_size - n_train
+
+    if shuffle_seed is not None:
+        random.seed(shuffle_seed)
+
+    random.shuffle(pathlist)
+
+    train_pathlist = pathlist[:n_train]
+    test_pathlist = pathlist[n_train:]
+
+    print(len(train_pathlist))
+    print(len(test_pathlist))
+
+    exit(0)
+
     train_X = np.zeros(
         (n_train, 217, 174), dtype=np.float64
     )

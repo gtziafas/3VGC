@@ -17,3 +17,6 @@ Tensors = Sequence[Tensor]
 
 TextSample = List[str]
 TextSamples = Sequence[TextSample]
+
+AudioSample = List[str]
+AudioSamples = Sequence[AudioSample]
