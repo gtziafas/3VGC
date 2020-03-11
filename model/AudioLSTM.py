@@ -95,7 +95,7 @@ def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_d
     # n_train = len(next(os.walk(train_dir)))
     # n_test = len(next(os.walk(test_dir)))
 
-    pathlist = Path(data_dir).glob('**/*')
+    pathlist = list(Path(data_dir).glob('**/*'))
 
     data_size = len(next(os.walk(data_dir)))
 

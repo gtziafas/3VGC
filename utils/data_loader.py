@@ -93,3 +93,4 @@ def default_text_dataloader(path: str = text_data_path, chunk_size: int = 10000,
         return list(map(lambda sentence_vectors: torch.tensor(sentence_vectors, dtype=torch.float), vectors))
 
     return TextDataLoader(path, chunk_size, batch_size, glove_embeddings)
+
