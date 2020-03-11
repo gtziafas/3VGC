@@ -96,11 +96,13 @@ def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_d
     # n_test = len(next(os.walk(test_dir)))
 
     pathlist = list(Path(data_dir).glob('**/*'))
+    data_size = len(pathlist)
+    print(data_size)
 
-    data_size = len(next(os.walk(data_dir)))
-
-    n_train = int(ceil(data_size * 8/10))
+    n_train = int(ceil(len(pathlist) * 8/10))
     n_test = data_size - n_train
+    print(n_train)
+    print(n_test)
 
     if shuffle_seed is not None:
         random.seed(shuffle_seed)
@@ -109,11 +111,6 @@ def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_d
 
     train_pathlist = pathlist[:n_train]
     test_pathlist = pathlist[n_train:]
-
-    print(len(train_pathlist))
-    print(len(test_pathlist))
-
-    exit(0)
 
     train_X = np.zeros(
         (n_train, 217, 174), dtype=np.float64
