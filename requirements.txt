@@ -1,3 +1,4 @@
+pandas
 spacy
 librosa
 youtube_dl

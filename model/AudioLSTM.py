@@ -5,7 +5,6 @@ Created on Sat Jan 25 11:42:00 2020
 @author: battu
 """
 
-import os
 import random
 from math import ceil
 from pathlib import Path
@@ -115,13 +114,13 @@ def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_d
     train_X = np.zeros(
         (n_train, 217, 174), dtype=np.float64
     )
-    train_Y = np.zeroes(
+    train_Y = np.zeros(
         (n_train, 3), dtype=np.float64
     )
     test_X = np.zeros(
         (n_test, 217, 174), dtype=np.float64
     )
-    test_Y = np.zeroes(
+    test_Y = np.zeros(
         (n_test, 3), dtype=np.float64
     )
 
@@ -134,7 +133,7 @@ def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_d
         train_X, train_Y = load_features_into_data(waveform, train_X, train_Y, count, file_name)
         count += 1
 
-        # Filling testing data
+    # Filling testing data
     count = 0
     for path in test_pathlist:
         file = str(path)
