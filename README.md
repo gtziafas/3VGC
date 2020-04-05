@@ -7,3 +7,7 @@ Deep Learning 2020 - Goals
 2. Video - 3dCNN(Exists) , Tune hyperparameters etc.
 3. Maybe text (optional)- Train CNN,Transformer,LSTM.
 4. Speech to text
+
+If you have trouble with torchaudio, these 2 solved my issues:
+!apt-get install sox libsox-dev libsox-fmt-all
+!pip install git+git://github.com/pytorch/audio
