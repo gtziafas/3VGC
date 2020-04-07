@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 class ThreeVGCAudio(Dataset):
 
-    def __init__(self, csv_path, file_path, folder_list, freq=16000, new_freq=8000):
+    def __init__(self, csv_path, file_path, folder_list, new_freq=8000):
         csv_data = pd.read_csv(csv_path)
         self.file_path = file_path
         self.folder_list = folder_list
@@ -23,8 +23,6 @@ class ThreeVGCAudio(Dataset):
 
         self.channel = 1
 
-        # TODO original frequency may not be the same for all files
-        self.freq = freq
         self.new_freq = new_freq
 
     def __getitem__(self, index):
@@ -34,7 +32,7 @@ class ThreeVGCAudio(Dataset):
         # Original sound size ([2, 221184])
         sound, sr = torchaudio.load(path, out=None, normalization=True)
         # Downsample to ~8Khz , sound_data size ([1, 44237]) ,
-        transformed = torchaudio.transforms.Resample(self.freq, self.new_freq)(sound[self.channel, :].view(1, -1))
+        transformed = torchaudio.transforms.Resample(sr, self.new_freq)(sound[self.channel, :].view(1, -1))
         # swap dimensions
         sound_data = transformed[0].unsqueeze(0)
         # pad the sound from 44237 to 32000
