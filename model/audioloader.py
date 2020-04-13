@@ -36,7 +36,7 @@ class ThreeVGCAudio(Dataset):
         # swap dimensions
         sound_data = transformed[0].unsqueeze(0)
         # pad the sound from 44237 to 32000
-        sound_padded = sound_data[:, :32000]
+        sound_padded = sound_data[:, :40000]
         # sound_padded = sound_padded.permute(1,0)
 
         return sound_padded, self.labels[index]
