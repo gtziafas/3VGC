@@ -63,3 +63,7 @@ def get_train_and_test_csv(seed=10, train_ratio=0.8):
     test_files.to_csv('test_file_paths.csv', index=False)
 
     return 'train_file_paths.csv', 'test_file_paths.csv'
+
+
+if __name__ == "__main__":
+    get_train_and_test_csv()
