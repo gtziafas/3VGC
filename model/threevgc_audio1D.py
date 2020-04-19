@@ -1,12 +1,13 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-#Implementation from the paper: https://arxiv.org/pdf/1610.00087.pdf
-#after M5 architecture 
 
-class ThreeVGCNet(nn.Module):
+# Implementation from the paper: https://arxiv.org/pdf/1610.00087.pdf
+# after M5 architecture
+
+class ThreeVGCAudioNet(nn.Module):
     def __init__(self):
-        super(ThreeVGCNet, self).__init__()
+        super(ThreeVGCAudioNet, self).__init__()
         self.conv1 = nn.Conv1d(1, 128, 80, 5)
         self.bn1 = nn.BatchNorm1d(128)
         self.pool1 = nn.MaxPool1d(4)
@@ -19,9 +20,9 @@ class ThreeVGCNet(nn.Module):
         self.conv4 = nn.Conv1d(256, 512, 3)
         self.bn4 = nn.BatchNorm1d(512)
         self.pool4 = nn.MaxPool1d(4)
-        self.avgPool = nn.AvgPool1d(30) #input should be 512x30 so this outputs a 512x1
+        self.avgPool = nn.AvgPool1d(30)  # input should be 512x30 so this outputs a 512x1
         self.fc1 = nn.Linear(512, 8)
-        
+
     def forward(self, x):
         x = self.conv1(x)
         x = F.relu(self.bn1(x))
@@ -36,11 +37,11 @@ class ThreeVGCNet(nn.Module):
         x = F.relu(self.bn4(x))
         x = self.pool4(x)
         x = self.avgPool(x)
-        x = x.permute(0, 2, 1) #change the 512x1 to 1x512
+        x = x.permute(0, 2, 1)  # change the 512x1 to 1x512
         x = self.fc1(x)
-        return F.log_softmax(x, dim = 2)
+        return F.log_softmax(x, dim=2)
+
 
 def threevgc():
-    model = ThreeVGCNet()
+    model = ThreeVGCAudioNet()
     return model
-

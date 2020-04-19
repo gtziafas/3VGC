@@ -4,22 +4,30 @@ import torchaudio
 from torch.utils.data import Dataset
 
 
-class ThreeVGCAudio(Dataset):
+class AudioDataset(Dataset):
 
-    def __init__(self, csv_path, file_path, folder_list, new_freq=8000):
+    def __init__(self, csv_path, duration_per_category, new_freq=8000):
+        """
+        Initialize an audio dataset
+        :param csv_path: path of csv file containing paths, generated with csv_extraction_script.py
+        :param duration_per_category: number of hours to load per category
+        :param new_freq: frequency to sample at
+        """
         csv_data = pd.read_csv(csv_path)
         self.file_path = file_path
-        self.folder_list = folder_list
         # initialize lists to hold file names, labels, and folder numbers
         self.file_names = []
         self.labels = []
         self.folders = []
+        # Assume each sample is 5 seconds, there are 720 samples per hour
+        self.samples_per_category = duration_per_category * 720
         # loop through the csv entries and only add entries from folders in the folder list
         for i in range(0, len(csv_data)):
-            if csv_data.iloc[i, 2] in folder_list:
+            if i > self.samples_per_category:
+                break
+            else:
                 self.file_names.append(csv_data.iloc[i, 0])
                 self.labels.append(csv_data.iloc[i, 1])
-                self.folders.append(csv_data.iloc[i, 2])
 
         self.channel = 1
 
@@ -27,7 +35,7 @@ class ThreeVGCAudio(Dataset):
 
     def __getitem__(self, index):
         # format the file path and load the file
-        path = self.file_path + str(self.folders[index]) + "/audio/" + self.file_names[index]
+        path = self.file_names[index]
         # load returns a tensor with the sound data and the sampling frequency (44.1kHz)
         # Original sound size ([2, 221184])
         sound, sr = torchaudio.load(path, out=None, normalization=True)
@@ -51,8 +59,8 @@ if __name__ == "__main__":
     # Category folders, renamed manually to 1,2
     # category_list = ['Documentary = 1', 'vlog = 2 ', 'test = 3']
 
-    train_set = ThreeVGCAudio(csv_path, file_path, [1, 2])
-    test_set = ThreeVGCAudio(csv_path, file_path, [3])
+    train_set = AudioDataset(csv_path, file_path, [1, 2])
+    test_set = AudioDataset(csv_path, file_path, [3])
     print("Train set size: " + str(len(train_set)))
     print("Test set size: " + str(len(test_set)))
 
