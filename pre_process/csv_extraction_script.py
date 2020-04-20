@@ -21,7 +21,9 @@ labels = [
     '00001000',
     '00100000',
     '00000100',
-    '01000000'
+    '01000000',
+    '00000001',
+    '00000010'
 ]
 
 # I give the paths in the similar order, music first and dramas next, make sure to have the / at the end
@@ -29,7 +31,9 @@ paths = [
     '/data/s4120310/music/audio/',
     '/data/s4120310/dramas/audio/'
     '/data/s4161947/sports/audio/',
-    '/data/s4161947/tv/audio/'
+    '/data/s4161947/tv/audio/',
+    '/data/s4130162/vlog/audio',
+    '/data/s4130162/documentary/audio'
 ]
 
 
