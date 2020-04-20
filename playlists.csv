@@ -1,6 +1,8 @@
 c, use l for labels and after each label use p for each playlist with duration before url (https://chrome.google.com/webstore/detail/youtube-playlist-duration/ijppgifnllaehojnpbphigenojfjnhml)
 l,vlog
+https://www.youtube.com/playlist?list=PLIfE8bXUGygsPd4rInpLm-ZNBFPii_bkc
 l,documentary
+https://www.youtube.com/playlist?list=PLIfE8bXUGygtRvVv-UkOHZMfh0Ra8QRGk
 l,sports
 p,00:21:06,https://www.youtube.com/playlist?list=PL-292yfpAFGaf26ZzQqcSBJHDpVO5dr3b
 p,40:07:08,https://www.youtube.com/playlist?list=PLjX7HmmCc89BuJ3UjuTOh94GXmsLVjxMy
