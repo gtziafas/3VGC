@@ -32,8 +32,8 @@ paths = [
     '/data/s4120310/dramas/audio/'
     '/data/s4161947/sports/audio/',
     '/data/s4161947/tv/audio/',
-    '/data/s4130162/vlog/audio',
-    '/data/s4130162/documentary/audio'
+    '/data/s4130162/vlog/audio/',
+    '/data/s4130162/documentary/audio/'
 ]
 
 
