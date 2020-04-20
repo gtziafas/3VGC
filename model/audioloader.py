@@ -14,11 +14,9 @@ class AudioDataset(Dataset):
         :param new_freq: frequency to sample at
         """
         csv_data = pd.read_csv(csv_path)
-        self.file_path = file_path
-        # initialize lists to hold file names, labels, and folder numbers
+        # initialize lists to hold file names & labels
         self.file_names = []
         self.labels = []
-        self.folders = []
         # Assume each sample is 5 seconds, there are 720 samples per hour
         self.samples_per_category = duration_per_category * 720
         # loop through the csv entries and only add entries from folders in the folder list
@@ -43,7 +41,7 @@ class AudioDataset(Dataset):
         transformed = torchaudio.transforms.Resample(sr, self.new_freq)(sound[self.channel, :].view(1, -1))
         # swap dimensions
         sound_data = transformed[0].unsqueeze(0)
-        # pad the sound from 44237 to 32000
+        # pad the sound from 44237 to 40000
         sound_padded = sound_data[:, :40000]
         # sound_padded = sound_padded.permute(1,0)
 
@@ -54,13 +52,11 @@ class AudioDataset(Dataset):
 
 
 if __name__ == "__main__":
-    csv_path = 'trantas_data.csv'
-    file_path = 'data/'
-    # Category folders, renamed manually to 1,2
-    # category_list = ['Documentary = 1', 'vlog = 2 ', 'test = 3']
+    csv_train_path = 'train_file_paths.csv'
+    csv_test_path = 'test_file_paths.csv'
 
-    train_set = AudioDataset(csv_path, file_path, [1, 2])
-    test_set = AudioDataset(csv_path, file_path, [3])
+    train_set = AudioDataset(csv_train_path)
+    test_set = AudioDataset(csv_test_path)
     print("Train set size: " + str(len(train_set)))
     print("Test set size: " + str(len(test_set)))
 
