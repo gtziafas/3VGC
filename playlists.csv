@@ -1,8 +1,8 @@
 c, use l for labels and after each label use p for each playlist with duration before url (https://chrome.google.com/webstore/detail/youtube-playlist-duration/ijppgifnllaehojnpbphigenojfjnhml)
 l,vlog
-https://www.youtube.com/playlist?list=PLIfE8bXUGygsPd4rInpLm-ZNBFPii_bkc
+p,,https://www.youtube.com/playlist?list=PLIfE8bXUGygsPd4rInpLm-ZNBFPii_bkc
 l,documentary
-https://www.youtube.com/playlist?list=PLIfE8bXUGygtRvVv-UkOHZMfh0Ra8QRGk
+p,,https://www.youtube.com/playlist?list=PLIfE8bXUGygtRvVv-UkOHZMfh0Ra8QRGk
 l,sports
 p,00:21:06,https://www.youtube.com/playlist?list=PL-292yfpAFGaf26ZzQqcSBJHDpVO5dr3b
 p,40:07:08,https://www.youtube.com/playlist?list=PLjX7HmmCc89BuJ3UjuTOh94GXmsLVjxMy
@@ -20,9 +20,10 @@ p,00:40:24,https://www.youtube.com/playlist?list=PL-292yfpAFGYmlIdIczF72SB_5oF7G
 p,00:17:45,https://www.youtube.com/playlist?list=PL-292yfpAFGZocGIDHIbPJpUI0PV366nT
 c,479:44:21,https://www.youtube.com/playlist?list=PLnaYFo37eXKUvS-SkkgHbMiKxFky4J7IX
 l,music
-https://www.youtube.com/playlist?list=PLhsz9CILh357zA1yMT-K5T9ZTNEU6Fl6n
+p,,https://www.youtube.com/playlist?list=PLhsz9CILh357zA1yMT-K5T9ZTNEU6Fl6n
 l,commercial
 l,drama
-https://www.youtube.com/playlist?list=PL_JpaeKji6t6gGw7B-isbXa4BYTKbQjyf
+p,,https://www.youtube.com/playlist?list=PL_JpaeKji6t6gGw7B-isbXa4BYTKbQjyf
 l,cartoon
 l,tv
+p,53:17:28,https://www.youtube.com/playlist?list=PLjX7HmmCc89APNPxeVxBFkW7EXxvnH4Bo
