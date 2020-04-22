@@ -159,16 +159,20 @@ def run_data():
     torch.save(test_X, '/data/s4120310/test_x.pt')
     torch.save(test_Y, '/data/s4120310/test_y.pt')
 
-def run_model(n_epochs = 100, batch_size = 50, lr = 0.001):
+def run_model(n_epochs = 100, batch_size = 50, lr = 0.001,load_model = False):
     train_X = torch.save('/data/s4120310/train_x.pt')
     train_Y = torch.save('/data/s4120310/train_y.pt')
     test_X = torch.save('/data/s4120310/test_x.pt')
     test_Y = torch.save('/data/s4120310/test_y.pt')
     
+    
     print("Build LSTM RNN model ...")
     model = LSTM(
         input_dim=174, hidden_dim=256, batch_size=batch_size, output_dim=8, num_layers=2
     )
+    
+    if load_model:
+      model.load_state_dict(torch.load('BestModel.mdl'))
     try:
       model.cuda()
     except:
@@ -216,6 +220,8 @@ def run_model(n_epochs = 100, batch_size = 50, lr = 0.001):
             "Epoch:  %d | NLLoss: %.4f | Train Accuracy: %.2f"
             % (epoch, train_running_loss / num_batches, train_acc / num_batches)
         )
+        if n_epochs%10 == 0:
+          torch.save(model.state_dict(), 'BestModel.mdl')
         
     
     
