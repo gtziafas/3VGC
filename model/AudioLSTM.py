@@ -160,10 +160,10 @@ def run_data():
     torch.save(test_Y, '/data/s4120310/test_y.pt')
 
 def run_model(n_epochs = 100, batch_size = 50, lr = 0.001,load_model = False):
-    train_X = torch.save('/data/s4120310/train_x.pt')
-    train_Y = torch.save('/data/s4120310/train_y.pt')
-    test_X = torch.save('/data/s4120310/test_x.pt')
-    test_Y = torch.save('/data/s4120310/test_y.pt')
+    train_X = torch.load('/data/s4120310/train_x.pt').to(device)
+    train_Y = torch.load('/data/s4120310/train_y.pt').to(device)
+    test_X = torch.load('/data/s4120310/test_x.pt').to(device)
+    test_Y = torch.load('/data/s4120310/test_y.pt').to(device)
     
     
     print("Build LSTM RNN model ...")
