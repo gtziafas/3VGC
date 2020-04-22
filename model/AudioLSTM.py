@@ -5,24 +5,27 @@ Created on Sat Jan 25 11:42:00 2020
 @author: battu
 """
 
-import random
-from math import ceil
-from pathlib import Path
-
+import os
 import librosa
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from pathlib import Path
+import pandas as pd
 
 train_on_gpu = torch.cuda.is_available()
 if train_on_gpu:
     print("\nTraining on GPU")
+    device = torch.device("cuda:0")  
 else:
     print("\nNo GPU, training on CPU")
-
-
+    device = torch.device("cpu")  
+    
+import warnings
+warnings.filterwarnings("ignore")
+    
 class LSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, batch_size, output_dim=3, num_layers=2):
         super(LSTM, self).__init__()
@@ -55,140 +58,181 @@ class LSTM(nn.Module):
     def get_accuracy(self, logits, target):
         """ compute accuracy for training round """
         corrects = (
-                torch.max(logits, 1)[1].view(target.size()).data == target.data
+            torch.max(logits, 1)[1].view(target.size()).data == target.data
         ).sum()
         accuracy = 100.0 * corrects / self.batch_size
         return accuracy.item()
-
-
-def load_features_into_data(waveform, data, labels, file_number, file_name):
-    mfcc = librosa.feature.mfcc(waveform, sr=44100, n_mfcc=15)
-    mel = librosa.feature.melspectrogram(waveform, sr=44100)
-    cens = librosa.feature.chroma_cens(waveform, sr=44100, n_chroma=15)
-    ton = librosa.feature.tonnetz(waveform, sr=44100, chroma=cens)
-    cqt = librosa.feature.chroma_cqt(waveform, sr=44100, n_chroma=5)
-    stft = librosa.feature.chroma_stft(waveform, sr=44100, n_chroma=5)
-    data[file_number, :, 0:15] = mfcc.T
-    data[file_number, :, 15:143] = mel.T
-    data[file_number, :, 143:158] = cens.T
-    data[file_number, :, 158:164] = ton.T
-    data[file_number, :, 164:169] = cqt.T
-    data[file_number, :, 169:174] = stft.T
-    label = file_name.split('_')[0]
-    for i in range(3):
-        labels[file_number][i] = label[i]
-    return data, labels
-
-
+    
+def load_features_into_data(waveform,data,labels,file_number,file_name,label):
+    
+      mfcc = librosa.feature.mfcc(waveform,sr = 44100, n_mfcc = 15)
+      mel = librosa.feature.melspectrogram(waveform, sr = 44100)
+      cens = librosa.feature.chroma_cens(waveform, sr = 44100, n_chroma = 15)
+      ton = librosa.feature.tonnetz(waveform,sr = 44100, chroma = cens)
+      cqt = librosa.feature.chroma_cqt(waveform,sr = 44100, n_chroma = 5)
+      stft = librosa.feature.chroma_stft(waveform, sr = 44100, n_chroma = 5)
+      data[file_number,:,0:15] = mfcc.T
+      data[file_number,:,15:143] = mel.T
+      data[file_number,:,143:158] = cens.T
+      data[file_number,:,158:164] = ton.T
+      data[file_number,:,164:169] = cqt.T
+      data[file_number,:,169:174] = stft.T
+      label = label
+      for i in range(8):
+          labels[file_number][i] = int(label[i])
+      return data,labels
+    
+    
 # Reading the data
-# TODO: make a data loader
-train_directory = '/data/s4120310/train_audio_data'
-test_directory = '/data/s4120310/test_audio_data'
-data_directory = '/data/s4161947/sports/audio'
+train_directory = 'train_file_paths.csv'
+test_directory = 'test_file_paths.csv'
 
-
-def get_data(train_dir=train_directory, test_dir=test_directory, data_dir=data_directory, shuffle_seed=None):
-    # train_pathlist = Path(train_dir).glob('**/*')
-    # test_pathlist = Path(test_dir).glob('**/*')
-
-    # n_train = len(next(os.walk(train_dir)))
-    # n_test = len(next(os.walk(test_dir)))
-
-    pathlist = list(Path(data_dir).glob('**/*'))
-    data_size = len(pathlist)
-    print(data_size)
-
-    n_train = int(ceil(len(pathlist) * 8/10))
-    n_test = data_size - n_train
-    print(n_train)
-    print(n_test)
-
-    if shuffle_seed is not None:
-        random.seed(shuffle_seed)
-
-    random.shuffle(pathlist)
-
-    train_pathlist = pathlist[:n_train]
-    test_pathlist = pathlist[n_train:]
-
+def get_data(train_csv = train_directory, test_csv = test_directory):
+    
+    print("Loading Data!....")
+    #train_pathlist = Path(train_dir).glob('**/*')
+    #test_pathlist = Path(test_dir).glob('**/*')
+    a = pd.read_csv(train_csv)
+    b = pd.read_csv(test_csv)
+    
+    
+    c = torch.zeros(4,3)    
+    c = c.to(device)
+    a = a.groupby('Label').apply(lambda x: x.sample(10000)).reset_index(drop=True)
+    b = b.groupby('Label').apply(lambda x: x.sample(5000)).reset_index(drop=True)
+    
+    
+    n_train = 20000
+    n_test = 10000
     train_X = np.zeros(
-        (n_train, 217, 174), dtype=np.float64
-    )
+            (n_train, 217, 174), dtype=np.float64
+        )
     train_Y = np.zeros(
-        (n_train, 3), dtype=np.float64
-    )
+            (n_train,8), dtype = np.float64
+        )
     test_X = np.zeros(
-        (n_test, 217, 174), dtype=np.float64
-    )
+            (n_test, 217, 174), dtype=np.float64
+        )
     test_Y = np.zeros(
-        (n_test, 3), dtype=np.float64
-    )
-
-    # Filling training data
+            (n_test,8), dtype = np.float64
+        )
+    
+    #Filling training data
     count = 0
-    for path in train_pathlist:
-        file = str(path)
-        file_name = file.split('/')[-1]
-        waveform, sr = librosa.load(file)
-        train_X, train_Y = load_features_into_data(waveform, train_X, train_Y, count, file_name)
-        count += 1
-
-    # Filling testing data
+    for i in range(n_train):
+        file_name = a.loc[i][0]
+        label = format(a.loc[i][1],'#08d')
+        #file_name = file.split('/')[-1]
+        waveform, sr = librosa.load(file_name)
+        try:
+          train_X, train_Y = load_features_into_data(waveform, train_X, train_Y, count, file_name,label)
+          count += 1 
+        except:
+          print("Missed data point at",count)
+          
+    
+    #Filling testing data
     count = 0
-    for path in test_pathlist:
-        file = str(path)
-        file_name = file.split('/')[-1]
-        waveform, sr = librosa.load(file)
-        test_X, test_Y = load_features_into_data(waveform, test_X, test_Y, count, file_name)
-        count += 1
+    for i in range(n_test):
+        file_name = b.loc[i][0]
+        label = format(b.loc[i][1],'#08d')
+        #file_name = file.split('/')[-1]
+        waveform, sr = librosa.load(file_name)
+        try:
+          test_X, test_Y = load_features_into_data(waveform, test_X, test_Y, count, file_name,label)
+          count += 1 
+        except:
+          print("Missed data point at",count)
+    print("Data Loading done!, Setting them up!")
     torch_train_X = torch.from_numpy(train_X).type(torch.Tensor)
     torch_train_Y = torch.from_numpy(train_Y).type(torch.LongTensor)
     torch_test_X = torch.from_numpy(test_X).type(torch.Tensor)
     torch_test_Y = torch.from_numpy(test_Y).type(torch.LongTensor)
-    return torch_train_X, torch_train_Y, torch_test_X, torch_test_Y
+    return torch_train_X,torch_train_Y,torch_test_X,torch_test_Y
 
 
-def run_model(n_epochs=400, batch_size=35, lr=0.001):
-    train_X, train_Y, test_X, test_Y = get_data(train_directory, test_directory)
+def run_data():
+    train_X, train_Y, test_X, test_Y = get_data(train_directory,test_directory)
+    
+    torch.save(train_X, '/data/s4120310/train_x.pt')
+    torch.save(train_Y, '/data/s4120310/train_y.pt')
+    torch.save(test_X, '/data/s4120310/test_x.pt')
+    torch.save(test_Y, '/data/s4120310/test_y.pt')
 
+def run_model(n_epochs = 100, batch_size = 50, lr = 0.001):
+    train_X = torch.save('/data/s4120310/train_x.pt')
+    train_Y = torch.save('/data/s4120310/train_y.pt')
+    test_X = torch.save('/data/s4120310/test_x.pt')
+    test_Y = torch.save('/data/s4120310/test_y.pt')
+    
     print("Build LSTM RNN model ...")
     model = LSTM(
-        input_dim=174, hidden_dim=256, batch_size=batch_size, output_dim=3, num_layers=2
+        input_dim=174, hidden_dim=256, batch_size=batch_size, output_dim=8, num_layers=2
     )
-    loss_function = nn.NLLLoss()
+    try:
+      model.cuda()
+    except:
+      pass
+    loss_function = nn.NLLLoss()  
     optimizer = optim.Adam(model.parameters(), lr=lr)
-
+    
     num_batches = int(train_X.shape[0] / batch_size)
-
+    
     val_loss_list, val_accuracy_list, epoch_list = [], [], []
-
+    
     print("Training ...")
     for epoch in range(n_epochs):
-
+    
         train_running_loss, train_acc = 0.0, 0.0
-
+    
+        
         model.hidden = model.init_hidden()
         for i in range(num_batches):
+    
+            
             model.zero_grad()
-
+    
+            
             X_local_minibatch, y_local_minibatch = (
-                train_X[i * batch_size: (i + 1) * batch_size, ],
-                train_Y[i * batch_size: (i + 1) * batch_size, ],
+                train_X[i * batch_size : (i + 1) * batch_size,],
+                train_Y[i * batch_size : (i + 1) * batch_size,],
             )
-
+    
+            
             X_local_minibatch = X_local_minibatch.permute(1, 0, 2)
-
+    
+            
             y_local_minibatch = torch.max(y_local_minibatch, 1)[1]
-
-            y_pred = model(X_local_minibatch)  # fwd the bass (forward pass)
+    
+            y_pred = model(X_local_minibatch)                # fwd the bass (forward pass)
             loss = loss_function(y_pred, y_local_minibatch)  # compute loss
-            loss.backward()  # reeeeewind (backward pass)
-            optimizer.step()  # parameter update
-
-            train_running_loss += loss.detach().item()  # unpacks the tensor into a scalar value
+            loss.backward()                                  # reeeeewind (backward pass)
+            optimizer.step()                                 # parameter update
+    
+            train_running_loss += loss.detach().item()       # unpacks the tensor into a scalar value
             train_acc += model.get_accuracy(y_pred, y_local_minibatch)
-
+    
         print(
             "Epoch:  %d | NLLoss: %.4f | Train Accuracy: %.2f"
             % (epoch, train_running_loss / num_batches, train_acc / num_batches)
         )
+        
+    
+    
+    
+    
+if __name__ == "__main__":
+  run_data() #Use with CPU
+  #run_model() #Use with GPU
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
