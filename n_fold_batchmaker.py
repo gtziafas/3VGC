@@ -18,8 +18,8 @@ b = pd.read_csv("test_file_paths.csv")
 
 
 for i in range(n_fold):
-    train_df = a.groupby('Label').apply(lambda x: x.sample(samples_per_labels)).reset_index(drop=True)
-    test_df = b.groupby('Label').apply(lambda x: x.sample(tests_per_labels)).reset_index(drop=True)
+    train_df = a.groupby('Label').apply(lambda x: x.sample(samples_per_labels)).reset_index(drop=False)
+    test_df = b.groupby('Label').apply(lambda x: x.sample(tests_per_labels)).reset_index(drop=False)
     train_df.to_csv('train'+str(i)+'.csv')
     test_df.to_csv('test'+str(i)+'.csv')
     
