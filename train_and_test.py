@@ -57,7 +57,7 @@ if __name__ == "__main__":
         print('Using cpu.\n')
     model = threevgc()
     model.to(device)
-    optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0001)
+    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
     
     
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         log_interval = 20
         for epoch in range(1, 41):
             if epoch == 21:
-                print("First round of training complete. Setting learn rate to 0.001.")
+                print("First round of training complete. Setting learn rate to 0.0001.")
             train(model, epoch)
             test(model, epoch)
             scheduler.step()
