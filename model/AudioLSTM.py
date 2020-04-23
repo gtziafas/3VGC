@@ -15,6 +15,7 @@ import torch.optim as optim
 from pathlib import Path
 import pandas as pd
 import pickle
+import threading
 
 train_on_gpu = torch.cuda.is_available()
 if train_on_gpu:
@@ -93,18 +94,29 @@ def get_data(train_csv = train_directory, test_csv = test_directory):
     print("Loading Data!....")
     #train_pathlist = Path(train_dir).glob('**/*')
     #test_pathlist = Path(test_dir).glob('**/*')
-    a = pd.read_csv(train_csv)
-    b = pd.read_csv(test_csv)
+    
+    
+    
     
     
     c = torch.zeros(4,3)    
     c = c.to(device)
-    a = a.groupby('Label').apply(lambda x: x.sample(10000)).reset_index(drop=True)
-    b = b.groupby('Label').apply(lambda x: x.sample(5000)).reset_index(drop=True)
     
     
-    n_train = 20000
-    n_test = 10000
+    classes = 6
+    
+    
+    
+    
+    n_train = 60000
+    n_test = 18000
+    
+    train_sample_per_class = int(n_train/classes)
+    test_sample_per_class = int(n_test/classes)
+    
+    
+    
+    
     train_X = np.zeros(
             (n_train, 217, 174), dtype=np.float64
         )
@@ -119,31 +131,49 @@ def get_data(train_csv = train_directory, test_csv = test_directory):
         )
     
     #Filling training data
-    count = 0
-    for i in range(n_train):
-        file_name = a.loc[i][0]
-        label = format(a.loc[i][1],'#08d')
-        #file_name = file.split('/')[-1]
-        waveform, sr = librosa.load(file_name)
-        try:
-          train_X, train_Y = load_features_into_data(waveform, train_X, train_Y, count, file_name,label)
-          count += 1 
-        except:
-          print("Missed data point at",count)
+    def train_thread():
+      nonlocal train_X,train_Y
+      print("Training_Thread")
+      a = pd.read_csv(train_csv)
+      a = a.groupby('Label').apply(lambda x: x.sample(train_sample_per_class)).reset_index(drop=True)
+      count = 0
+      for i in range(n_train):
+          file_name = a.loc[i][0]
+          label = format(a.loc[i][1],'#08d')
+          #file_name = file.split('/')[-1]
+          waveform, sr = librosa.load(file_name)
+          try:
+            train_X, train_Y = load_features_into_data(waveform, train_X, train_Y, count, file_name,label)
+            count += 1 
+          except Exception as e:
+            print("Missed data point at",count,e)
           
     
     #Filling testing data
-    count = 0
-    for i in range(n_test):
-        file_name = b.loc[i][0]
-        label = format(b.loc[i][1],'#08d')
-        #file_name = file.split('/')[-1]
-        waveform, sr = librosa.load(file_name)
-        try:
-          test_X, test_Y = load_features_into_data(waveform, test_X, test_Y, count, file_name,label)
-          count += 1 
-        except:
-          print("Missed data point at",count)
+    def test_thread():
+      nonlocal test_X,test_Y
+      print("Testing_Thread")
+      b = pd.read_csv(test_csv)
+      b = b.groupby('Label').apply(lambda x: x.sample(test_sample_per_class)).reset_index(drop=True)
+      count = 0
+      for i in range(n_test):
+          file_name = b.loc[i][0]
+          label = format(b.loc[i][1],'#08d')
+          #file_name = file.split('/')[-1]
+          waveform, sr = librosa.load(file_name)
+          try:
+            test_X, test_Y = load_features_into_data(waveform, test_X, test_Y, count, file_name,label)
+            count += 1 
+          except Exception as e:
+            print("Missed data point at",count,e)
+            
+    t1 = threading.Thread(target=train_thread)
+    t2 = threading.Thread(target=test_thread)
+    t1.start()
+    t2.start()
+    
+    t1.join()
+    t2.join()
     print("Data Loading done!, Setting them up!")
     torch_train_X = torch.from_numpy(train_X).type(torch.Tensor)
     torch_train_Y = torch.from_numpy(train_Y).type(torch.LongTensor)
@@ -160,7 +190,7 @@ def run_data():
     torch.save(test_X, '/data/s4120310/test_x.pt')
     torch.save(test_Y, '/data/s4120310/test_y.pt')
 
-def run_model(n_epochs = 100, batch_size = 50, lr = 0.001,load_model = False):
+def run_model(n_epochs = 100, batch_size = 20, lr = 0.0001,load_model = False):
     train_X = torch.load('/data/s4120310/train_x.pt').to(device)
     train_Y = torch.load('/data/s4120310/train_y.pt').to(device)
     test_X = torch.load('/data/s4120310/test_x.pt').to(device)
@@ -275,8 +305,8 @@ def run_model(n_epochs = 100, batch_size = 50, lr = 0.001,load_model = False):
     
     
 if __name__ == "__main__":
-  #run_data() #Use with CPU
-  run_model() #Use with GPU
+  run_data() #Use with CPU
+  #run_model() #Use with GPU
     
     
     
