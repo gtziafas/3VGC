@@ -14,6 +14,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from pathlib import Path
 import pandas as pd
+import pickle
 
 train_on_gpu = torch.cuda.is_available()
 if train_on_gpu:
@@ -175,13 +176,15 @@ def run_model(n_epochs = 100, batch_size = 50, lr = 0.001,load_model = False):
       model.load_state_dict(torch.load('BestModel.mdl'))
     try:
       model.cuda()
-    except:
+    except Exception as e:
+      print(e)
       pass
     loss_function = nn.NLLLoss()  
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
     num_batches = int(train_X.shape[0] / batch_size)
-    
+    num_dev_batches = int(test_X.shape[0] / batch_size)
+
     val_loss_list, val_accuracy_list, epoch_list = [], [], []
     
     print("Training ...")
@@ -223,13 +226,57 @@ def run_model(n_epochs = 100, batch_size = 50, lr = 0.001,load_model = False):
         if n_epochs%10 == 0:
           torch.save(model.state_dict(), 'BestModel.mdl')
         
+        print("Validation ...")  
+        if epoch % 10 == 0:
+            val_running_loss, val_acc = 0.0, 0.0
     
+            # Compute validation loss, accuracy. Use torch.no_grad() & model.eval()
+            with torch.no_grad():
+                model.eval()
     
+                model.hidden = model.init_hidden()
+                for i in range(num_dev_batches):
+                    X_local_validation_minibatch, y_local_validation_minibatch = (
+                        test_X[i * batch_size : (i + 1) * batch_size,],
+                        test_Y[i * batch_size : (i + 1) * batch_size,],
+                    )
+                    X_local_minibatch = X_local_validation_minibatch.permute(1, 0, 2)
+                    y_local_minibatch = torch.max(y_local_validation_minibatch, 1)[1]
+    
+                    y_pred = model(X_local_minibatch)
+                    val_loss = loss_function(y_pred, y_local_minibatch)
+    
+                    val_running_loss += (
+                        val_loss.detach().item()
+                    )  # unpacks the tensor into a scalar value
+                    val_acc += model.get_accuracy(y_pred, y_local_minibatch)
+    
+                model.train()  # reset to train mode after iterationg through validation data
+                print(
+                    "Epoch:  %d | NLLoss: %.4f | Train Accuracy: %.2f | Val Loss %.4f  | Val Accuracy: %.2f"
+                    % (
+                        epoch,
+                        train_running_loss / num_batches,
+                        train_acc / num_batches,
+                        val_running_loss / num_dev_batches,
+                        val_acc / num_dev_batches,
+                    )
+                )
+    
+            epoch_list.append(epoch)
+            val_accuracy_list.append(val_acc / num_dev_batches)
+            val_loss_list.append(val_running_loss / num_dev_batches)
+    
+    results = [epoch_list,val_accuracy_list,val_loss_list]
+    f = open('Validation_results.pkl','wb')
+    pickle.dump(results,f)
+    f.close()
+        
     
     
 if __name__ == "__main__":
-  run_data() #Use with CPU
-  #run_model() #Use with GPU
+  #run_data() #Use with CPU
+  run_model() #Use with GPU
     
     
     
