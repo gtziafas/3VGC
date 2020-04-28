@@ -95,19 +95,11 @@ def get_data(train_csv = train_directory, test_csv = test_directory):
     #train_pathlist = Path(train_dir).glob('**/*')
     #test_pathlist = Path(test_dir).glob('**/*')
     
-    
-    
-    
-    
     c = torch.zeros(4,3)    
     c = c.to(device)
     
     
     classes = 6
-    
-    
-    
-    
     n_train = 60000
     n_test = 18000
     
@@ -132,40 +124,49 @@ def get_data(train_csv = train_directory, test_csv = test_directory):
     
     #Filling training data
     def train_thread():
-      nonlocal train_X,train_Y
+      nonlocal train_X,train_Y,n_train,train_sample_per_class
       print("Training_Thread")
       a = pd.read_csv(train_csv)
-      a = a.groupby('Label').apply(lambda x: x.sample(train_sample_per_class)).reset_index(drop=True)
+      a = a.groupby('Label').apply(lambda x: x.sample(10000)).reset_index(drop=True)
       count = 0
       for i in range(n_train):
+          #print(i)
           file_name = a.loc[i][0]
           label = format(a.loc[i][1],'#08d')
           #file_name = file.split('/')[-1]
-          waveform, sr = librosa.load(file_name)
+          
           try:
+            waveform, sr = librosa.load(file_name)
             train_X, train_Y = load_features_into_data(waveform, train_X, train_Y, count, file_name,label)
             count += 1 
           except Exception as e:
             print("Missed data point at",count,e)
-          
+      print("Training Count:",count)
+      train_X = train_X[:-(n_train-count-1)]
+      train_Y = train_Y[:-(n_train-count-1)]
     
     #Filling testing data
     def test_thread():
-      nonlocal test_X,test_Y
+      nonlocal test_X,test_Y,n_test,test_sample_per_class
       print("Testing_Thread")
       b = pd.read_csv(test_csv)
-      b = b.groupby('Label').apply(lambda x: x.sample(test_sample_per_class)).reset_index(drop=True)
+      b = b.groupby('Label').apply(lambda x: x.sample(3000)).reset_index(drop=True)
       count = 0
       for i in range(n_test):
+          #print(i)
           file_name = b.loc[i][0]
           label = format(b.loc[i][1],'#08d')
           #file_name = file.split('/')[-1]
-          waveform, sr = librosa.load(file_name)
+          
           try:
+            waveform, sr = librosa.load(file_name)
             test_X, test_Y = load_features_into_data(waveform, test_X, test_Y, count, file_name,label)
             count += 1 
           except Exception as e:
             print("Missed data point at",count,e)
+      print("Testing Count:",count)
+      test_X = test_X[:-(n_test-count-1)]
+      test_Y = test_Y[:-(n_test-count-1)]
             
     t1 = threading.Thread(target=train_thread)
     t2 = threading.Thread(target=test_thread)
@@ -185,19 +186,46 @@ def get_data(train_csv = train_directory, test_csv = test_directory):
 def run_data():
     train_X, train_Y, test_X, test_Y = get_data(train_directory,test_directory)
     
-    torch.save(train_X, '/data/s4120310/train_x.pt')
-    torch.save(train_Y, '/data/s4120310/train_y.pt')
-    torch.save(test_X, '/data/s4120310/test_x.pt')
-    torch.save(test_Y, '/data/s4120310/test_y.pt')
+    for i in range(60):
+      if i==59:
+        torch.save(train_X[i*1000:].clone(), '/data/s4120310/tensors/train_x_'+str(i)+'.pt')
+        torch.save(train_Y[i*1000:].clone(), '/data/s4120310/tensors/train_y_'+str(i)+'.pt')
+        break
+      torch.save(train_X[i*1000:(i+1)*1000].clone(), '/data/s4120310/tensors/train_x_'+str(i)+'.pt')
+      torch.save(train_Y[i*1000:(i+1)*1000].clone(), '/data/s4120310/tensors/train_y_'+str(i)+'.pt')
+    
+    for i in range(18):
+      if i==17:
+        torch.save(test_X[i*1000:].clone(), '/data/s4120310/tensors/test_x_'+str(i)+'.pt')
+        torch.save(test_Y[i*1000:].clone(), '/data/s4120310/tensors/test_y_'+str(i)+'.pt')  
+    
+      torch.save(test_X[i*1000:(i+1)*1000].clone(), '/data/s4120310/tensors/test_x_'+str(i)+'.pt')
+      torch.save(test_Y[i*1000:(i+1)*1000].clone(), '/data/s4120310/tensors/test_y_'+str(i)+'.pt')
 
 def run_model(n_epochs = 100, batch_size = 20, lr = 0.0001,load_model = False):
-    train_X = torch.load('/data/s4120310/train_x.pt').to(device)
-    train_Y = torch.load('/data/s4120310/train_y.pt').to(device)
-    test_X = torch.load('/data/s4120310/test_x.pt').to(device)
-    test_Y = torch.load('/data/s4120310/test_y.pt').to(device)
+
+    
+    print("Reloading Data...")
+    
+    train_X = torch.load('/data/s4120310/tensors/train_x_0.pt').to(device)
+    train_Y = torch.load('/data/s4120310/tensors/train_y_0.pt').to(device)
+    test_X = torch.load('/data/s4120310/tensors/test_x_0.pt').to(device)
+    test_Y = torch.load('/data/s4120310/tensors/test_y_0.pt').to(device)
+    for i in range(1,60):
+     train_X = torch.cat([train_X,torch.load('/data/s4120310/tensors/train_x_'+str(i)+'.pt') ],0)
+     train_Y = torch.cat([train_Y,torch.load('/data/s4120310/tensors/train_y_'+str(i)+'.pt') ],0)
+    for i in range(1,18):
+     test_X = torch.cat([test_X,torch.load('/data/s4120310/tensors/test_x_'+str(i)+'.pt') ],0)
+     test_Y = torch.cat([test_Y,torch.load('/data/s4120310/tensors/test_y_'+str(i)+'.pt') ],0)
+    train_X = train_X.to(device)
+    train_Y = train_Y.to(device)
+    test_X = test_X.to(device)
+    test_Y = test_Y.to(device)
+    
     
     
     print("Build LSTM RNN model ...")
+    
     model = LSTM(
         input_dim=174, hidden_dim=256, batch_size=batch_size, output_dim=8, num_layers=2
     )
@@ -214,7 +242,7 @@ def run_model(n_epochs = 100, batch_size = 20, lr = 0.0001,load_model = False):
     
     num_batches = int(train_X.shape[0] / batch_size)
     num_dev_batches = int(test_X.shape[0] / batch_size)
-
+    print(train_X.shape,test_X.shape)
     val_loss_list, val_accuracy_list, epoch_list = [], [], []
     
     print("Training ...")
@@ -298,15 +326,15 @@ def run_model(n_epochs = 100, batch_size = 20, lr = 0.0001,load_model = False):
             val_loss_list.append(val_running_loss / num_dev_batches)
     
     results = [epoch_list,val_accuracy_list,val_loss_list]
-    f = open('Validation_results.pkl','wb')
+    f = open('/home/s4120310/results.pkl','wb')
     pickle.dump(results,f)
     f.close()
         
     
     
 if __name__ == "__main__":
-  run_data() #Use with CPU
-  #run_model() #Use with GPU
+  #run_data() #Use with CPU
+  run_model() #Use with GPU
     
     
     
