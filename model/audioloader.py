@@ -55,8 +55,8 @@ if __name__ == "__main__":
     csv_train_path = 'train_file_paths.csv'
     csv_test_path = 'test_file_paths.csv'
 
-    train_set = AudioDataset(csv_train_path)
-    test_set = AudioDataset(csv_test_path)
+    train_set = AudioDataset(csv_train_path, 16)
+    test_set = AudioDataset(csv_test_path, 4)
     print("Train set size: " + str(len(train_set)))
     print("Test set size: " + str(len(test_set)))
 

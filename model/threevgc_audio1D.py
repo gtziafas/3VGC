@@ -2,12 +2,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# Implementation from the paper: https://arxiv.org/pdf/1610.00087.pdf
-# after M5 architecture
+class ThreeVGCAudio1D(nn.Module):
+    """
+    Implementation from the paper: https://arxiv.org/pdf/1610.00087.pdf
+    after M5 architecture
+    """
 
-class ThreeVGCAudioNet(nn.Module):
     def __init__(self):
-        super(ThreeVGCAudioNet, self).__init__()
+        super(ThreeVGCAudio1D, self).__init__()
         self.conv1 = nn.Conv1d(1, 128, 80, 5)
         self.bn1 = nn.BatchNorm1d(128)
         self.pool1 = nn.MaxPool1d(4)
@@ -43,5 +45,5 @@ class ThreeVGCAudioNet(nn.Module):
 
 
 def threevgc():
-    model = ThreeVGCAudioNet()
+    model = ThreeVGCAudio1D()
     return model
