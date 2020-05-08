@@ -10,6 +10,13 @@ from model.threevgc_audio2D import *
 
 
 def train(model, epoch, csvwriter):
+    """
+    Train the given model during the given epoch
+    :param model: model to train
+    :param epoch: integer specifying which epoch
+    :param csvwriter: csvwriter object for writing output to csv
+    :return: vector containing training losses
+    """
     model.train()
     train_losses = list()
     for batch_idx, (data, target) in enumerate(trainloader):
@@ -32,6 +39,13 @@ def train(model, epoch, csvwriter):
 
 
 def test(model, epoch, csvwriter):
+    """
+    Test the given model during the given epoch
+    :param model: model to test
+    :param epoch: integer specifying which epoch
+    :param csvwriter: csvwriter object for writing output to csv
+    :return: vector containing test accuracies
+    """
     model.eval()
     correct = 0
     test_accuracies = list()

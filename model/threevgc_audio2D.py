@@ -3,6 +3,10 @@ import torch.nn.functional as F
 
 
 class ThreeVGCAudio2D(nn.Module):
+    """
+    Implementation of a 2D convolutional neural network for audio classification
+    Based on https://arxiv.org/abs/1609.09430
+    """
     def __init__(self):
         super(ThreeVGCAudio2D, self).__init__()
         # 1 input audio channel, 24 output channels, 3x3 square convolution kernel
