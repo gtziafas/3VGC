@@ -9,6 +9,38 @@ from torch.autograd import Variable
 from model.md1 import *
 from model.md2 import *
 
+class ThreeVGCAudio(Dataset):
+
+    def __init__(self, csv_path, new_freq=8000):
+        csv_data = pd.read_csv(csv_path)
+        # initialize lists to hold file names, labels, and folder numbers
+        self.file_names = []
+        self.labels = []
+        # loop through the csv entries and only add entries from folders in the folder list
+        for i in range(0, len(csv_data)):
+            self.file_names.append(csv_data.iloc[i, 1])
+            self.labels.append(csv_data.iloc[i, 2])
+
+        self.channel = 0
+
+        self.new_freq = new_freq
+
+    def __getitem__(self, index):
+        # format the file path and load the file
+        path = self.file_names[index]
+        # load returns a tensor with the sound data and the sampling frequency (44.1kHz)
+        # Original sound size ([2, 221184])
+        sound, sr = torchaudio.load(path, out=None, normalization=True)
+        # Downsample to ~8Khz , sound_data size ([1, 44237]) ,
+        transformed = torchaudio.transforms.Resample(sr, self.new_freq)(sound[self.channel, :].view(1, -1))
+        # swap dimensions
+        sound_data = transformed[0].unsqueeze(0)
+        # pad the sound from 44237 to 40000
+        sound_padded = sound_data[:, :40000]
+        return sound_padded, self.labels[index]
+
+    def __len__(self):
+        return len(self.file_names)
 
 def train(model, epoch, device):
     model.train()
